@@ -2,6 +2,7 @@ import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { motion } from "motion/react";
 import { SidebarContentPanel } from "@/components/layout/Sidebar";
 import { TopNavigation } from "@/components/layout/TopNavigation";
+import { ConnectionBanner } from "@/components/layout/ConnectionBanner";
 import { LoadingState } from "@/components/clay/StateViews";
 import { useHydrated } from "@/hooks/useHydrated";
 
@@ -23,6 +24,7 @@ function ShellLayout() {
         {hydrated ? (
           <>
             <TopNavigation />
+            <ConnectionBanner />
             <motion.main
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
