@@ -59,6 +59,7 @@ function DashboardPage() {
   const summary = useSummary();
   const [range, setRange] = useState<(typeof RANGES)[number]>("1H");
   const [refreshing, setRefreshing] = useState(false);
+  const hydrated = useHydrated();
   const [selectedWorker, setSelectedWorker] = useState<Worker | null>(null);
   const [simulateFor, setSimulateFor] = useState<string | undefined>();
   const [simOpen, setSimOpen] = useState(false);
