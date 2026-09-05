@@ -12,6 +12,8 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ShellRouteImport } from './routes/_shell'
 import { Route as ShellDashboardRouteImport } from './routes/_shell.dashboard'
+import { Route as ShellResourcesRouteImport } from './routes/_shell.resources'
+import { Route as ShellSchedulerRouteImport } from './routes/_shell.scheduler'
 import { Route as ShellTasksRouteImport } from './routes/_shell.tasks'
 import { Route as ShellWorkersRouteImport } from './routes/_shell.workers'
 
@@ -29,6 +31,16 @@ const ShellDashboardRoute = ShellDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => ShellRoute,
 } as any)
+const ShellResourcesRoute = ShellResourcesRouteImport.update({
+  id: '/resources',
+  path: '/resources',
+  getParentRoute: () => ShellRoute,
+} as any)
+const ShellSchedulerRoute = ShellSchedulerRouteImport.update({
+  id: '/scheduler',
+  path: '/scheduler',
+  getParentRoute: () => ShellRoute,
+} as any)
 const ShellTasksRoute = ShellTasksRouteImport.update({
   id: '/tasks',
   path: '/tasks',
@@ -43,12 +55,16 @@ const ShellWorkersRoute = ShellWorkersRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof ShellDashboardRoute
+  '/resources': typeof ShellResourcesRoute
+  '/scheduler': typeof ShellSchedulerRoute
   '/tasks': typeof ShellTasksRoute
   '/workers': typeof ShellWorkersRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof ShellDashboardRoute
+  '/resources': typeof ShellResourcesRoute
+  '/scheduler': typeof ShellSchedulerRoute
   '/tasks': typeof ShellTasksRoute
   '/workers': typeof ShellWorkersRoute
 }
@@ -57,19 +73,24 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_shell': typeof ShellRouteWithChildren
   '/_shell/dashboard': typeof ShellDashboardRoute
+  '/_shell/resources': typeof ShellResourcesRoute
+  '/_shell/scheduler': typeof ShellSchedulerRoute
   '/_shell/tasks': typeof ShellTasksRoute
   '/_shell/workers': typeof ShellWorkersRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/dashboard' | '/tasks' | '/workers'
+  fullPaths:
+    '/' | '/dashboard' | '/resources' | '/scheduler' | '/tasks' | '/workers'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dashboard' | '/tasks' | '/workers'
+  to: '/' | '/dashboard' | '/resources' | '/scheduler' | '/tasks' | '/workers'
   id:
     | '__root__'
     | '/'
     | '/_shell'
     | '/_shell/dashboard'
+    | '/_shell/resources'
+    | '/_shell/scheduler'
     | '/_shell/tasks'
     | '/_shell/workers'
   fileRoutesById: FileRoutesById
@@ -102,6 +123,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShellDashboardRouteImport
       parentRoute: typeof ShellRoute
     }
+    '/_shell/resources': {
+      id: '/_shell/resources'
+      path: '/resources'
+      fullPath: '/resources'
+      preLoaderRoute: typeof ShellResourcesRouteImport
+      parentRoute: typeof ShellRoute
+    }
+    '/_shell/scheduler': {
+      id: '/_shell/scheduler'
+      path: '/scheduler'
+      fullPath: '/scheduler'
+      preLoaderRoute: typeof ShellSchedulerRouteImport
+      parentRoute: typeof ShellRoute
+    }
     '/_shell/tasks': {
       id: '/_shell/tasks'
       path: '/tasks'
@@ -121,12 +156,16 @@ declare module '@tanstack/react-router' {
 
 interface ShellRouteChildren {
   ShellDashboardRoute: typeof ShellDashboardRoute
+  ShellResourcesRoute: typeof ShellResourcesRoute
+  ShellSchedulerRoute: typeof ShellSchedulerRoute
   ShellTasksRoute: typeof ShellTasksRoute
   ShellWorkersRoute: typeof ShellWorkersRoute
 }
 
 const ShellRouteChildren: ShellRouteChildren = {
   ShellDashboardRoute: ShellDashboardRoute,
+  ShellResourcesRoute: ShellResourcesRoute,
+  ShellSchedulerRoute: ShellSchedulerRoute,
   ShellTasksRoute: ShellTasksRoute,
   ShellWorkersRoute: ShellWorkersRoute,
 }
