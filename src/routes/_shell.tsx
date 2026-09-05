@@ -2,6 +2,8 @@ import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { motion } from "motion/react";
 import { SidebarContentPanel } from "@/components/layout/Sidebar";
 import { TopNavigation } from "@/components/layout/TopNavigation";
+import { LoadingState } from "@/components/clay/StateViews";
+import { useHydrated } from "@/hooks/useHydrated";
 
 export const Route = createFileRoute("/_shell")({
   component: ShellLayout,
