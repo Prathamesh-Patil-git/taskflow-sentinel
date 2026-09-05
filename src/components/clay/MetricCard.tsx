@@ -8,11 +8,11 @@ interface Props {
   label: string;
   value: string;
   icon: LucideIcon;
-  change?: number;
+  change?: number | undefined;
   changeCaption?: string;
-  sparkline?: number[];
+  sparkline?: number[] | undefined;
   tone?: "primary" | "success" | "warning" | "danger" | "info";
-  index?: number;
+  index?: number | undefined;
 }
 
 const TONE: Record<NonNullable<Props["tone"]>, { text: string; bg: string; stroke: string }> = {

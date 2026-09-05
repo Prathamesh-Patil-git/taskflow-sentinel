@@ -10,33 +10,73 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ShellRouteImport } from './routes/_shell'
+import { Route as ShellDashboardRouteImport } from './routes/_shell.dashboard'
+import { Route as ShellTasksRouteImport } from './routes/_shell.tasks'
+import { Route as ShellWorkersRouteImport } from './routes/_shell.workers'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ShellRoute = ShellRouteImport.update({
+  id: '/_shell',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShellDashboardRoute = ShellDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => ShellRoute,
+} as any)
+const ShellTasksRoute = ShellTasksRouteImport.update({
+  id: '/tasks',
+  path: '/tasks',
+  getParentRoute: () => ShellRoute,
+} as any)
+const ShellWorkersRoute = ShellWorkersRouteImport.update({
+  id: '/workers',
+  path: '/workers',
+  getParentRoute: () => ShellRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/dashboard': typeof ShellDashboardRoute
+  '/tasks': typeof ShellTasksRoute
+  '/workers': typeof ShellWorkersRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/dashboard': typeof ShellDashboardRoute
+  '/tasks': typeof ShellTasksRoute
+  '/workers': typeof ShellWorkersRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_shell': typeof ShellRouteWithChildren
+  '/_shell/dashboard': typeof ShellDashboardRoute
+  '/_shell/tasks': typeof ShellTasksRoute
+  '/_shell/workers': typeof ShellWorkersRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/dashboard' | '/tasks' | '/workers'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/dashboard' | '/tasks' | '/workers'
+  id:
+    | '__root__'
+    | '/'
+    | '/_shell'
+    | '/_shell/dashboard'
+    | '/_shell/tasks'
+    | '/_shell/workers'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ShellRoute: typeof ShellRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +88,54 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_shell': {
+      id: '/_shell'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof ShellRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_shell/dashboard': {
+      id: '/_shell/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof ShellDashboardRouteImport
+      parentRoute: typeof ShellRoute
+    }
+    '/_shell/tasks': {
+      id: '/_shell/tasks'
+      path: '/tasks'
+      fullPath: '/tasks'
+      preLoaderRoute: typeof ShellTasksRouteImport
+      parentRoute: typeof ShellRoute
+    }
+    '/_shell/workers': {
+      id: '/_shell/workers'
+      path: '/workers'
+      fullPath: '/workers'
+      preLoaderRoute: typeof ShellWorkersRouteImport
+      parentRoute: typeof ShellRoute
+    }
   }
 }
 
+interface ShellRouteChildren {
+  ShellDashboardRoute: typeof ShellDashboardRoute
+  ShellTasksRoute: typeof ShellTasksRoute
+  ShellWorkersRoute: typeof ShellWorkersRoute
+}
+
+const ShellRouteChildren: ShellRouteChildren = {
+  ShellDashboardRoute: ShellDashboardRoute,
+  ShellTasksRoute: ShellTasksRoute,
+  ShellWorkersRoute: ShellWorkersRoute,
+}
+
+const ShellRouteWithChildren = ShellRoute._addFileChildren(ShellRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ShellRoute: ShellRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

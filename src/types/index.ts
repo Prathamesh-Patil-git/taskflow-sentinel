@@ -115,6 +115,15 @@ export interface SystemSnapshot {
   updatedAt: number;
 }
 
+export interface MetricKeyed<T> {
+  totalTasks: T;
+  runningTasks: T;
+  completedTasks: T;
+  failedTasks: T;
+  activeWorkers: T;
+  throughput: T;
+}
+
 export interface DashboardSummary {
   totalTasks: number;
   runningTasks: number;
@@ -126,6 +135,6 @@ export interface DashboardSummary {
   memoryUtilization: number;
   systemHealth: number;
   schedulerEfficiency: number;
-  trends: Record<string, number>;
-  sparklines: Record<string, number[]>;
+  trends: MetricKeyed<number>;
+  sparklines: MetricKeyed<number[]>;
 }

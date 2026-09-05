@@ -29,7 +29,7 @@ export function FailureSimulationModal({
   workers: Worker[];
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  defaultWorkerId?: string;
+  defaultWorkerId?: string | undefined;
 }) {
   const candidates = workers.filter((w) => w.status === "online" || w.status === "overloaded");
   const [workerId, setWorkerId] = useState(defaultWorkerId ?? candidates[0]?.id ?? "");
