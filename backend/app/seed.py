@@ -77,6 +77,7 @@ async def seed(
                 list(TaskPriority), weights=[10, 25, 45, 20], k=1
             )[0]
             worker_id = random.choice(worker_ids)
+            worker = {w.worker_id: w for w in workers}.get(worker_id)
             roll = random.random() * (0.86 if history_only else 1.0)
             if roll < 0.65:
                 status = TaskStatus.COMPLETED
@@ -107,18 +108,20 @@ async def seed(
                 scheduled_at=created + timedelta(seconds=random.randint(1, 4)),
             )
             if status in (TaskStatus.RUNNING, TaskStatus.COMPLETED, TaskStatus.FAILED):
-                task.assigned_worker_id = worker.worker_id
+                task.assigned_worker_id = worker_id
                 task.started_at = created + timedelta(seconds=random.randint(2, 8))
             if status is TaskStatus.COMPLETED:
                 task.completed_at = task.started_at + timedelta(seconds=duration)
                 task.actual_duration = duration
                 task.result = "ok"
-                worker.total_tasks_completed += 1
+                if worker:
+                    worker.total_tasks_completed += 1
             if status is TaskStatus.FAILED:
                 task.failed_at = task.started_at + timedelta(seconds=duration / 2)
                 task.error_message = "worker reported execution error"
-                worker.total_tasks_failed += 1
-            if status is TaskStatus.RUNNING:
+                if worker:
+                    worker.total_tasks_failed += 1
+            if status is TaskStatus.RUNNING and worker:
                 worker.active_tasks += 1
                 worker.cpu_usage = min(worker.cpu_capacity, worker.cpu_usage + task.cpu_required)
                 worker.memory_usage = min(
@@ -147,9 +150,9 @@ async def seed(
                     event_type="SCHEDULER_DECISION",
                     component="scheduler",
                     level="INFO",
-                    worker_id=worker.worker_id,
+                    worker_id=worker_id,
                     task_id=task.task_id,
-                    message=f"{task.task_id} assigned to {worker.worker_id} (RESOURCE_AWARE)",
+                    message=f"{task.task_id} assigned to {worker_id} (RESOURCE_AWARE)",
                     event_metadata={
                         "algorithm": random.choice(
                             ["RESOURCE_AWARE", "LEAST_LOADED", "ROUND_ROBIN", "PRIORITY_BASED"]
@@ -157,11 +160,11 @@ async def seed(
                         "task_name": task.name,
                         "cpu_required": task.cpu_required,
                         "memory_required": task.memory_required,
-                        "selected_worker_id": worker.worker_id,
+                        "selected_worker_id": worker_id,
                         "latency": round(random.uniform(0.05, 1.4), 3),
                         "scores": [
-                            {"worker_id": w.worker_id, "score": round(random.uniform(0.4, 0.97), 2)}
-                            for w in random.sample(workers[:-1], 3)
+                            {"worker_id": wid, "score": round(random.uniform(0.4, 0.97), 2)}
+                            for wid in random.sample(worker_ids, min(3, len(worker_ids)))
                         ],
                     },
                     created_at=created,
@@ -203,8 +206,24 @@ async def seed(
             )
 
         await session.commit()
-    print(f"Seeded {worker_count} workers and {task_count} tasks.")
+    print(
+        f"Seeded {0 if history_only else worker_count} workers and {task_count} "
+        f"{'historical ' if history_only else ''}tasks."
+    )
 
 
 if __name__ == "__main__":
-    asyncio.run(seed())
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Seed TaskFlow Sentinel demo data")
+    parser.add_argument(
+        "--history-only",
+        action="store_true",
+        help="only historical finished records — no fake workers, heartbeats or live tasks",
+    )
+    parser.add_argument("--tasks", type=int, default=60)
+    parser.add_argument("--workers", type=int, default=8)
+    args = parser.parse_args()
+    asyncio.run(
+        seed(worker_count=args.workers, task_count=args.tasks, history_only=args.history_only)
+    )
