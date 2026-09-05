@@ -80,7 +80,12 @@ async def heartbeat(session: AsyncSession, worker_id: str, payload: HeartbeatIn)
     worker.cpu_usage = min(payload.cpu_usage, worker.cpu_capacity)
     worker.memory_usage = min(payload.memory_usage, worker.memory_capacity)
     worker.active_tasks = payload.active_tasks
-    worker.uptime_seconds += settings.heartbeat_interval
+    if payload.cpu_count:
+        worker.cpu_capacity = float(payload.cpu_count)
+    if payload.uptime_seconds is not None:
+        worker.uptime_seconds = int(payload.uptime_seconds)
+    else:
+        worker.uptime_seconds += settings.heartbeat_interval
     worker.last_heartbeat = utcnow()
     if worker.status is WorkerStatus.OFFLINE:
         worker.status = WorkerStatus.ONLINE
@@ -118,6 +123,15 @@ async def heartbeat(session: AsyncSession, worker_id: str, payload: HeartbeatIn)
     return worker
 
 
+async def set_paused(worker_id: str, paused: bool) -> None:
+    """Flip the worker runtime kill-switch used by the failure simulation."""
+    await redis_gateway.set_worker_paused(worker_id, paused)
+
+
+async def is_paused(worker_id: str) -> bool:
+    return await redis_gateway.worker_paused(worker_id)
+
+
 async def recover_worker(session: AsyncSession, worker_id: str) -> Worker:
     worker = await get_worker(session, worker_id)
     worker.status = WorkerStatus.ONLINE
@@ -125,6 +139,7 @@ async def recover_worker(session: AsyncSession, worker_id: str) -> Worker:
     worker.memory_usage = 0
     worker.active_tasks = 0
     worker.last_heartbeat = utcnow()
+    await set_paused(worker_id, False)
     await _cache(worker)
     await events.emit(
         session,
