@@ -255,8 +255,16 @@ export async function getFaults(): Promise<Fault[]> {
   return (data?.faults ?? []).map(mapFault);
 }
 
-export async function getAnalytics() {
-  return (await http.get("/api/analytics")).data;
+export async function getAnalyticsOverview(): Promise<Record<string, number>> {
+  return (await http.get("/api/analytics/overview")).data;
+}
+
+export async function getAlgorithmComparison(): Promise<Record<string, any>[]> {
+  return (await http.get("/api/analytics/scheduling")).data;
+}
+
+export async function getResourceAnalytics(): Promise<Record<string, any>> {
+  return (await http.get("/api/analytics/resources")).data;
 }
 
 export async function getLogs(params?: Record<string, unknown>): Promise<LogEntry[]> {
