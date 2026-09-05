@@ -47,7 +47,7 @@ function range(min: number, max: number) {
   return min + rnd() * (max - min);
 }
 function pick<T>(items: T[]): T {
-  return items[Math.floor(rnd() * items.length)];
+  return items[Math.floor(rnd() * items.length)] as T;
 }
 function clamp(v: number, min = 0, max = 100) {
   return Math.min(max, Math.max(min, v));
@@ -72,7 +72,7 @@ function makeWorker(index: number): Worker {
     uptime: Math.round(range(3600 * 12, 3600 * 24 * 9)),
     lastHeartbeat: Date.now() - Math.round(range(500, 4000)),
     reliability: Math.round(range(96, 100)),
-    region: REGIONS[index % REGIONS.length],
+    region: REGIONS[index % REGIONS.length] as string,
   };
 }
 
@@ -138,12 +138,14 @@ function buildSeries(): SeriesPoint[] {
 
 function initialState(): SystemSnapshot {
   const workers = Array.from({ length: 8 }, (_, i) => makeWorker(i));
-  workers[5].status = "overloaded";
-  workers[5].cpuUsage = 91;
-  workers[7].status = "offline";
-  workers[7].cpuUsage = 0;
-  workers[7].memoryUsage = 0;
-  workers[7].activeTasks = 0;
+  const hot = workers[5]!;
+  hot.status = "overloaded";
+  hot.cpuUsage = 91;
+  const down = workers[7]!;
+  down.status = "offline";
+  down.cpuUsage = 0;
+  down.memoryUsage = 0;
+  down.activeTasks = 0;
 
   const tasks = Array.from({ length: 64 }, () => makeTask(workers));
   const scheduler: SchedulerState = {
@@ -220,7 +222,7 @@ function seedFaults(workers: Worker[]): Fault[] {
   const base = Date.now() - 3 * 3600_000;
   return Array.from({ length: 4 }, (_, i) => {
     faultCounter += 1;
-    const w = workers[(i * 2) % workers.length];
+    const w = workers[(i * 2) % workers.length]!;
     const at = base + i * 2400_000;
     return {
       id: `F-${1000 + faultCounter}`,
@@ -252,7 +254,10 @@ function makeDecision(state: SystemSnapshot): SchedulingDecision {
     workerId: w.id,
     score: Math.round(clamp(100 - w.cpuUsage * 0.5 - w.memoryUsage * 0.3 + range(0, 18))),
   }));
-  const best = scores.reduce((a, b) => (b.score > a.score ? b : a), scores[0]);
+  const best = scores.reduce<{ workerId: string; score: number } | undefined>(
+    (a, b) => (!a || b.score > a.score ? b : a),
+    undefined,
+  );
   return {
     taskId: `T-${taskCounter}`,
     taskName: pick(TASK_NAMES),
