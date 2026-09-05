@@ -22,6 +22,7 @@ import { FailureSimulationModal } from "@/components/clay/FailureSimulationModal
 import { LoadingState } from "@/components/clay/StateViews";
 import { Button } from "@/components/ui/button";
 import { useSystem, useSummary } from "@/hooks/useSystem";
+import { useHydrated } from "@/hooks/useHydrated";
 import { formatClock, formatNumber } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type { Worker } from "@/types";
