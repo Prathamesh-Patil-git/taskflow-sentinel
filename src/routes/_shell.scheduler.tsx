@@ -78,7 +78,6 @@ function SchedulerPage() {
           label="Scheduling Rate"
           value={`${scheduler.schedulingRate}/sec`}
           icon={Cpu}
-          change={3.1}
         />
         <MetricCard
           index={1}
@@ -86,7 +85,6 @@ function SchedulerPage() {
           value={`${scheduler.averageLatency} ms`}
           icon={Timer}
           tone="info"
-          change={-5.2}
         />
         <MetricCard
           index={2}
@@ -94,7 +92,6 @@ function SchedulerPage() {
           value={formatNumber(scheduler.queueDepth)}
           icon={Layers}
           tone="warning"
-          change={2.4}
         />
         <MetricCard
           index={3}
@@ -102,7 +99,6 @@ function SchedulerPage() {
           value={`${scheduler.efficiency}%`}
           icon={Gauge}
           tone="success"
-          change={1.6}
         />
       </div>
 
