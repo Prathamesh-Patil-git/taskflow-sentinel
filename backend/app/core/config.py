@@ -23,12 +23,16 @@ class Settings(BaseSettings):
     scheduler_tick: float = 0.5
     detector_tick: float = 1.0
 
-    cors_origins: str = "http://localhost:3000,http://localhost:8080"
+    frontend_url: str = "http://localhost:3000"
+    cors_origins: str = "http://localhost:3000,http://localhost:8080,http://localhost:5173"
     log_level: str = "INFO"
 
     @property
     def cors_origin_list(self) -> list[str]:
-        return [o.strip() for o in self.cors_origins.split(",") if o.strip()]
+        origins = [o.strip() for o in self.cors_origins.split(",") if o.strip()]
+        if self.frontend_url and self.frontend_url not in origins:
+            origins.append(self.frontend_url)
+        return origins
 
 
 @lru_cache

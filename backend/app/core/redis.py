@@ -154,6 +154,17 @@ class RedisGateway:
     async def release_task_lock(self, task_id: str) -> None:
         await self.client.delete(task_lock_key(task_id))
 
+    # ---- worker control flags -------------------------------------------
+    async def set_worker_paused(self, worker_id: str, paused: bool) -> None:
+        key = f"taskflow:worker:{worker_id}:paused"
+        if paused:
+            await self.client.set(key, "1")
+        else:
+            await self.client.delete(key)
+
+    async def worker_paused(self, worker_id: str) -> bool:
+        return bool(await self.client.get(f"taskflow:worker:{worker_id}:paused"))
+
     # ---- pub/sub ---------------------------------------------------------
     async def publish_event(self, event: dict[str, Any]) -> None:
         await self.client.publish(EVENTS_CHANNEL, json.dumps(event, default=str))
