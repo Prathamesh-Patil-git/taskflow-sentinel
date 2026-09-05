@@ -57,6 +57,7 @@ const SERIES = [
 function DashboardPage() {
   const state = useSystem();
   const summary = useSummary();
+  const health = live.getHealth();
   const [range, setRange] = useState<(typeof RANGES)[number]>("1H");
   const [refreshing, setRefreshing] = useState(false);
   const hydrated = useHydrated();
@@ -236,18 +237,31 @@ function DashboardPage() {
             </div>
           </div>
           <div className="mt-4 space-y-2">
-            <HealthIndicator name="Scheduler" state="healthy" detail={`${state.scheduler.schedulingRate} tasks/sec`} />
+            <HealthIndicator
+              name="Scheduler"
+              state={healthState(health["scheduler"])}
+              detail={`${state.scheduler.schedulingRate} tasks/sec`}
+            />
             <HealthIndicator
               name="Worker Network"
-              state={failedWorkers ? "degraded" : "healthy"}
+              state={healthState(health["workers"])}
               detail={`${summary.activeWorkers} nodes reporting`}
             />
             <HealthIndicator
               name="Task Queue"
-              state={state.scheduler.queueDepth > 220 ? "degraded" : "healthy"}
+              state={healthState(health["queue"])}
               detail={`${state.scheduler.queueDepth} queued`}
             />
-            <HealthIndicator name="Database" state="healthy" detail="Replication lag 12 ms" />
+            <HealthIndicator
+              name="Database"
+              state={healthState(health["database"])}
+              detail={health["database"] === "HEALTHY" ? "PostgreSQL reachable" : "Connection issue"}
+            />
+            <HealthIndicator
+              name="Redis"
+              state={healthState(health["redis"])}
+              detail={health["redis"] === "HEALTHY" ? "Queue and pub/sub online" : "Degraded"}
+            />
           </div>
         </ClayCard>
 
