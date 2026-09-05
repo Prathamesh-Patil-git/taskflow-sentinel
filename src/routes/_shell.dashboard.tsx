@@ -22,6 +22,7 @@ import { FailureSimulationModal } from "@/components/clay/FailureSimulationModal
 import { LoadingState } from "@/components/clay/StateViews";
 import { Button } from "@/components/ui/button";
 import { useSystem, useSummary } from "@/hooks/useSystem";
+import { useHydrated } from "@/hooks/useHydrated";
 import { formatClock, formatNumber } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type { Worker } from "@/types";
@@ -58,6 +59,7 @@ function DashboardPage() {
   const summary = useSummary();
   const [range, setRange] = useState<(typeof RANGES)[number]>("1H");
   const [refreshing, setRefreshing] = useState(false);
+  const hydrated = useHydrated();
   const [selectedWorker, setSelectedWorker] = useState<Worker | null>(null);
   const [simulateFor, setSimulateFor] = useState<string | undefined>();
   const [simOpen, setSimOpen] = useState(false);
@@ -100,7 +102,7 @@ function DashboardPage() {
               Live
             </span>
             <span className="text-xs text-muted-foreground">
-              Updated {formatClock(state.updatedAt)}
+              {hydrated ? `Updated ${formatClock(state.updatedAt)}` : "Updated just now"}
             </span>
             <Button
               variant="ghost"

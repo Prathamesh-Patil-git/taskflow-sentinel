@@ -11,9 +11,13 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ShellRouteImport } from './routes/_shell'
+import { Route as ShellAnalyticsRouteImport } from './routes/_shell.analytics'
 import { Route as ShellDashboardRouteImport } from './routes/_shell.dashboard'
+import { Route as ShellFaultsRouteImport } from './routes/_shell.faults'
+import { Route as ShellLogsRouteImport } from './routes/_shell.logs'
 import { Route as ShellResourcesRouteImport } from './routes/_shell.resources'
 import { Route as ShellSchedulerRouteImport } from './routes/_shell.scheduler'
+import { Route as ShellSettingsRouteImport } from './routes/_shell.settings'
 import { Route as ShellTasksRouteImport } from './routes/_shell.tasks'
 import { Route as ShellWorkersRouteImport } from './routes/_shell.workers'
 
@@ -26,9 +30,24 @@ const ShellRoute = ShellRouteImport.update({
   id: '/_shell',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ShellAnalyticsRoute = ShellAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => ShellRoute,
+} as any)
 const ShellDashboardRoute = ShellDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => ShellRoute,
+} as any)
+const ShellFaultsRoute = ShellFaultsRouteImport.update({
+  id: '/faults',
+  path: '/faults',
+  getParentRoute: () => ShellRoute,
+} as any)
+const ShellLogsRoute = ShellLogsRouteImport.update({
+  id: '/logs',
+  path: '/logs',
   getParentRoute: () => ShellRoute,
 } as any)
 const ShellResourcesRoute = ShellResourcesRouteImport.update({
@@ -39,6 +58,11 @@ const ShellResourcesRoute = ShellResourcesRouteImport.update({
 const ShellSchedulerRoute = ShellSchedulerRouteImport.update({
   id: '/scheduler',
   path: '/scheduler',
+  getParentRoute: () => ShellRoute,
+} as any)
+const ShellSettingsRoute = ShellSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => ShellRoute,
 } as any)
 const ShellTasksRoute = ShellTasksRouteImport.update({
@@ -54,17 +78,25 @@ const ShellWorkersRoute = ShellWorkersRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/analytics': typeof ShellAnalyticsRoute
   '/dashboard': typeof ShellDashboardRoute
+  '/faults': typeof ShellFaultsRoute
+  '/logs': typeof ShellLogsRoute
   '/resources': typeof ShellResourcesRoute
   '/scheduler': typeof ShellSchedulerRoute
+  '/settings': typeof ShellSettingsRoute
   '/tasks': typeof ShellTasksRoute
   '/workers': typeof ShellWorkersRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/analytics': typeof ShellAnalyticsRoute
   '/dashboard': typeof ShellDashboardRoute
+  '/faults': typeof ShellFaultsRoute
+  '/logs': typeof ShellLogsRoute
   '/resources': typeof ShellResourcesRoute
   '/scheduler': typeof ShellSchedulerRoute
+  '/settings': typeof ShellSettingsRoute
   '/tasks': typeof ShellTasksRoute
   '/workers': typeof ShellWorkersRoute
 }
@@ -72,25 +104,52 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_shell': typeof ShellRouteWithChildren
+  '/_shell/analytics': typeof ShellAnalyticsRoute
   '/_shell/dashboard': typeof ShellDashboardRoute
+  '/_shell/faults': typeof ShellFaultsRoute
+  '/_shell/logs': typeof ShellLogsRoute
   '/_shell/resources': typeof ShellResourcesRoute
   '/_shell/scheduler': typeof ShellSchedulerRoute
+  '/_shell/settings': typeof ShellSettingsRoute
   '/_shell/tasks': typeof ShellTasksRoute
   '/_shell/workers': typeof ShellWorkersRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/dashboard' | '/resources' | '/scheduler' | '/tasks' | '/workers'
+    | '/'
+    | '/analytics'
+    | '/dashboard'
+    | '/faults'
+    | '/logs'
+    | '/resources'
+    | '/scheduler'
+    | '/settings'
+    | '/tasks'
+    | '/workers'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dashboard' | '/resources' | '/scheduler' | '/tasks' | '/workers'
+  to:
+    | '/'
+    | '/analytics'
+    | '/dashboard'
+    | '/faults'
+    | '/logs'
+    | '/resources'
+    | '/scheduler'
+    | '/settings'
+    | '/tasks'
+    | '/workers'
   id:
     | '__root__'
     | '/'
     | '/_shell'
+    | '/_shell/analytics'
     | '/_shell/dashboard'
+    | '/_shell/faults'
+    | '/_shell/logs'
     | '/_shell/resources'
     | '/_shell/scheduler'
+    | '/_shell/settings'
     | '/_shell/tasks'
     | '/_shell/workers'
   fileRoutesById: FileRoutesById
@@ -116,11 +175,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShellRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_shell/analytics': {
+      id: '/_shell/analytics'
+      path: '/analytics'
+      fullPath: '/analytics'
+      preLoaderRoute: typeof ShellAnalyticsRouteImport
+      parentRoute: typeof ShellRoute
+    }
     '/_shell/dashboard': {
       id: '/_shell/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof ShellDashboardRouteImport
+      parentRoute: typeof ShellRoute
+    }
+    '/_shell/faults': {
+      id: '/_shell/faults'
+      path: '/faults'
+      fullPath: '/faults'
+      preLoaderRoute: typeof ShellFaultsRouteImport
+      parentRoute: typeof ShellRoute
+    }
+    '/_shell/logs': {
+      id: '/_shell/logs'
+      path: '/logs'
+      fullPath: '/logs'
+      preLoaderRoute: typeof ShellLogsRouteImport
       parentRoute: typeof ShellRoute
     }
     '/_shell/resources': {
@@ -135,6 +215,13 @@ declare module '@tanstack/react-router' {
       path: '/scheduler'
       fullPath: '/scheduler'
       preLoaderRoute: typeof ShellSchedulerRouteImport
+      parentRoute: typeof ShellRoute
+    }
+    '/_shell/settings': {
+      id: '/_shell/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof ShellSettingsRouteImport
       parentRoute: typeof ShellRoute
     }
     '/_shell/tasks': {
@@ -155,17 +242,25 @@ declare module '@tanstack/react-router' {
 }
 
 interface ShellRouteChildren {
+  ShellAnalyticsRoute: typeof ShellAnalyticsRoute
   ShellDashboardRoute: typeof ShellDashboardRoute
+  ShellFaultsRoute: typeof ShellFaultsRoute
+  ShellLogsRoute: typeof ShellLogsRoute
   ShellResourcesRoute: typeof ShellResourcesRoute
   ShellSchedulerRoute: typeof ShellSchedulerRoute
+  ShellSettingsRoute: typeof ShellSettingsRoute
   ShellTasksRoute: typeof ShellTasksRoute
   ShellWorkersRoute: typeof ShellWorkersRoute
 }
 
 const ShellRouteChildren: ShellRouteChildren = {
+  ShellAnalyticsRoute: ShellAnalyticsRoute,
   ShellDashboardRoute: ShellDashboardRoute,
+  ShellFaultsRoute: ShellFaultsRoute,
+  ShellLogsRoute: ShellLogsRoute,
   ShellResourcesRoute: ShellResourcesRoute,
   ShellSchedulerRoute: ShellSchedulerRoute,
+  ShellSettingsRoute: ShellSettingsRoute,
   ShellTasksRoute: ShellTasksRoute,
   ShellWorkersRoute: ShellWorkersRoute,
 }
