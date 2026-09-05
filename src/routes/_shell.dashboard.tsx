@@ -100,7 +100,7 @@ function DashboardPage() {
               Live
             </span>
             <span className="text-xs text-muted-foreground">
-              Updated {formatClock(state.updatedAt)}
+              {hydrated ? `Updated ${formatClock(state.updatedAt)}` : "Updated just now"}
             </span>
             <Button
               variant="ghost"
