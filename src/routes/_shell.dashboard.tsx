@@ -22,10 +22,18 @@ import { FailureSimulationModal } from "@/components/clay/FailureSimulationModal
 import { LoadingState } from "@/components/clay/StateViews";
 import { Button } from "@/components/ui/button";
 import { useSystem, useSummary } from "@/hooks/useSystem";
+import { live } from "@/services/api";
 import { useHydrated } from "@/hooks/useHydrated";
 import { formatClock, formatNumber } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type { Worker } from "@/types";
+
+/** Maps a backend component state (HEALTHY/DEGRADED/DOWN) to the indicator UI. */
+function healthState(value?: string): "healthy" | "degraded" | "down" {
+  if (value === "DEGRADED") return "degraded";
+  if (value === "DOWN") return "down";
+  return "healthy";
+}
 
 export const Route = createFileRoute("/_shell/dashboard")({
   head: () => ({
