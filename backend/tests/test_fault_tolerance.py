@@ -43,7 +43,7 @@ async def test_simulated_failure_recovers_running_tasks(session, workers):
     assert all(t.status is TaskStatus.RUNNING for t in tasks)
 
     # 3. simulate the crash
-    result = await fault_service.simulate_failure(session, victim)
+    result = await fault_service.simulate_failure(session, victim, immediate=True)
     await session.commit()
 
     assert result["affected_tasks"] == 10
@@ -147,3 +147,30 @@ async def test_heartbeat_timeout_creates_fault_and_recovers(session, workers):
     faults = await fault_service.list_faults(session)
     assert faults and faults[0].status is FaultStatus.RECOVERED
     assert task.status is TaskStatus.QUEUED and task.retry_count == 1
+
+
+async def test_detector_mode_simulation_stops_heartbeat_only(session, workers):
+    """Default simulate-failure mode must not fake the DB status: it stops the
+    real worker runtime so the heartbeat timeout drives the detection."""
+    result = await fault_service.simulate_failure(session, "worker-01")
+    await session.commit()
+
+    assert result["mode"] == "detector"
+    worker = await worker_service.get_worker(session, "worker-01")
+    assert worker.status is not WorkerStatus.FAILED
+    assert await worker_service.is_paused("worker-01") is True
+
+    # the failure detector observes the stale heartbeat and marks it FAILED
+    from app.fault_tolerance.failure_detector import failure_detector
+
+    worker.last_heartbeat = utcnow() - timedelta(seconds=120)
+    await session.commit()
+    await failure_detector.scan(session)
+    await session.commit()
+
+    await session.refresh(worker)
+    assert worker.status is WorkerStatus.FAILED
+
+    await worker_service.recover_worker(session, "worker-01")
+    await session.commit()
+    assert await worker_service.is_paused("worker-01") is False
