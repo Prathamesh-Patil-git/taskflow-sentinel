@@ -6,6 +6,7 @@ import { CircularGauge, toneForValue } from "@/components/clay/CircularGauge";
 import { AreaSeriesChart, BarSeriesChart, LegendPills } from "@/components/clay/PerformanceChart";
 import { WorkerStatusBadge } from "@/components/clay/StatusBadge";
 import { useSystem } from "@/hooks/useSystem";
+import { useResources } from "@/hooks/useApi";
 import { formatClock } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
@@ -36,10 +37,17 @@ const UTIL_SERIES = [
 function ResourcesPage() {
   const { workers, series } = useSystem();
   const live = workers.filter((w) => w.status !== "offline" && w.status !== "failed");
-  const cpu = Math.round(live.reduce((a, w) => a + w.cpuUsage, 0) / Math.max(1, live.length));
-  const memory = Math.round(live.reduce((a, w) => a + w.memoryUsage, 0) / Math.max(1, live.length));
-  const storage = Math.min(99, Math.round(cpu * 0.6 + 12));
-  const network = Math.min(99, Math.round(memory * 0.45 + 4));
+  const { data: resources } = useResources();
+  const cpu = Math.round(
+    resources?.["cpu_utilization"] ??
+      live.reduce((a, w) => a + w.cpuUsage, 0) / Math.max(1, live.length),
+  );
+  const memory = Math.round(
+    resources?.["memory_utilization"] ??
+      live.reduce((a, w) => a + w.memoryUsage, 0) / Math.max(1, live.length),
+  );
+  const storage = Math.round(resources?.["storage_utilization"] ?? 0);
+  const network = Math.round(resources?.["network_utilization"] ?? 0);
 
   const utilData = useMemo(
     () =>

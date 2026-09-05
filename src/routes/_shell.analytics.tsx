@@ -12,6 +12,7 @@ import {
   LegendPills,
 } from "@/components/clay/PerformanceChart";
 import { useSystem, useSummary } from "@/hooks/useSystem";
+import { useAlgorithmComparison, useAnalyticsOverview } from "@/hooks/useApi";
 import { formatClock, formatNumber } from "@/lib/format";
 
 export const Route = createFileRoute("/_shell/analytics")({
@@ -40,11 +41,6 @@ const ALGO_SERIES = [
   { key: "latency", label: "Sched. latency (ms)", color: "var(--warning)" },
 ];
 
-const ALGO_DATA = [
-  { label: "Round Robin", completion: 58, cpu: 61, failure: 3.4, latency: 61 },
-  { label: "Least Loaded", completion: 46, cpu: 72, failure: 2.1, latency: 48 },
-  { label: "Resource Aware", completion: 38, cpu: 81, failure: 1.3, latency: 42 },
-];
 
 const THROUGHPUT_SERIES = [{ key: "throughput", label: "Tasks/min", color: "var(--primary)" }];
 const OUTCOME_SERIES = [
@@ -55,6 +51,19 @@ const OUTCOME_SERIES = [
 function AnalyticsPage() {
   const { series, workers, tasks } = useSystem();
   const summary = useSummary();
+  const { data: overview } = useAnalyticsOverview();
+  const { data: comparison } = useAlgorithmComparison();
+
+  const algoData = (comparison ?? []).map((row: Record<string, any>) => ({
+    label: String(row["algorithm"] ?? "")
+      .toLowerCase()
+      .replace(/_/g, " ")
+      .replace(/\b\w/g, (c) => c.toUpperCase()),
+    completion: Math.round(row["average_execution_time"] ?? 0),
+    cpu: Math.round(row["cpu_utilization"] ?? 0),
+    failure: Math.round((row["failure_rate"] ?? 0) * 10) / 10,
+    latency: Math.round(row["average_latency"] ?? 0),
+  }));
 
   const chart = useMemo(
     () =>
@@ -86,15 +95,33 @@ function AnalyticsPage() {
       />
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <MetricCard index={0} label="Throughput" value={`${formatNumber(summary.throughput)} /min`} icon={Zap} change={6.5} />
-        <MetricCard index={1} label="Average Latency" value="184 ms" icon={Timer} tone="info" change={-4.8} />
-        <MetricCard index={2} label="Success Rate" value={`${successRate.toFixed(1)}%`} icon={CheckCircle2} tone="success" change={1.2} />
-        <MetricCard index={3} label="Avg Recovery Time" value="3.2 sec" icon={Activity} tone="warning" change={-9.4} />
+        <MetricCard index={0} label="Throughput" value={`${formatNumber(summary.throughput)} /min`} icon={Zap} change={summary.trends.throughput} />
+        <MetricCard
+          index={1}
+          label="Scheduling Latency"
+          value={`${Math.round((overview?.["average_scheduling_latency"] ?? 0) * 1000)} ms`}
+          icon={Timer}
+          tone="info"
+        />
+        <MetricCard
+          index={2}
+          label="Success Rate"
+          value={`${(overview?.["success_rate"] ?? successRate).toFixed(1)}%`}
+          icon={CheckCircle2}
+          tone="success"
+        />
+        <MetricCard
+          index={3}
+          label="Avg Recovery Time"
+          value={`${(overview?.["average_recovery_time"] ?? 0).toFixed(1)} sec`}
+          icon={Activity}
+          tone="warning"
+        />
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <ClayCard className="flex justify-center">
-          <CircularGauge value={Math.round(successRate)} label="Success" tone="success" caption="Completed vs failed" />
+          <CircularGauge value={Math.round(overview?.["success_rate"] ?? successRate)} label="Success" tone="success" caption="Completed vs failed" />
         </ClayCard>
         <ClayCard className="flex justify-center">
           <CircularGauge value={summary.cpuUtilization} label="CPU" tone={toneForValue(summary.cpuUtilization)} caption="Fleet average" />
@@ -103,7 +130,12 @@ function AnalyticsPage() {
           <CircularGauge value={summary.memoryUtilization} label="Memory" tone={toneForValue(summary.memoryUtilization)} caption="Fleet average" />
         </ClayCard>
         <ClayCard className="flex justify-center">
-          <CircularGauge value={99.8} label="Availability" tone="success" caption="Worker uptime (30d)" />
+          <CircularGauge
+            value={Math.round(overview?.["worker_availability"] ?? 0)}
+            label="Availability"
+            tone="success"
+            caption="Workers reporting heartbeats"
+          />
         </ClayCard>
       </div>
 
@@ -143,9 +175,15 @@ function AnalyticsPage() {
       <ClayCard>
         <ClaySectionHeader
           title="Scheduling Algorithm Comparison"
-          description="Measured across the last 10,000 scheduled tasks."
+          description="Measured from recorded scheduling decisions in this cluster."
         />
-        <BarSeriesChart data={ALGO_DATA} series={ALGO_SERIES} height={320} showLegend />
+        {algoData.length ? (
+          <BarSeriesChart data={algoData} series={ALGO_SERIES} height={320} showLegend />
+        ) : (
+          <p className="clay-inset rounded-2xl p-6 text-sm text-muted-foreground">
+            No scheduling decisions recorded yet — submit tasks to compare algorithms.
+          </p>
+        )}
       </ClayCard>
     </div>
   );

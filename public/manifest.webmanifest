@@ -1,0 +1,13 @@
+{
+  "name": "TaskFlow Sentinel",
+  "short_name": "TaskFlow",
+  "description": "Fault-tolerant distributed task scheduling and resource allocation control center.",
+  "start_url": "/dashboard",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#F4F6FA",
+  "theme_color": "#6366F1",
+  "icons": [
+    { "src": "/favicon.ico", "sizes": "48x48", "type": "image/x-icon" }
+  ]
+}

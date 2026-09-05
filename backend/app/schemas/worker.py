@@ -22,9 +22,22 @@ class WorkerRegisterOut(BaseModel):
 
 
 class HeartbeatIn(BaseModel):
-    cpu_usage: float = Field(ge=0)
-    memory_usage: float = Field(ge=0)
+    """Real OS level metrics reported by the worker container (psutil)."""
+
+    cpu_usage: float = Field(ge=0, description="cores in use / cpu percent as absolute value")
+    memory_usage: float = Field(ge=0, description="MB of memory in use")
     active_tasks: int = Field(default=0, ge=0)
+    cpu_percent: float | None = Field(default=None, ge=0, le=100)
+    memory_percent: float | None = Field(default=None, ge=0, le=100)
+    memory_available: float | None = Field(default=None, ge=0, description="bytes")
+    cpu_count: int | None = Field(default=None, ge=0, le=1024)
+    uptime_seconds: float | None = Field(default=None, ge=0)
+
+
+class WorkerControl(BaseModel):
+    worker_id: str
+    paused: bool
+    heartbeat_interval: int
 
 
 class WorkerOut(BaseModel):

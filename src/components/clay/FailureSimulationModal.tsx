@@ -38,15 +38,19 @@ export function FailureSimulationModal({
     const target = workerId || candidates[0]?.id;
     if (!target) return;
     onOpenChange(false);
-    const fault = await simulateFailure(target);
-    toast.error(`${target} marked FAILED`, {
-      description: `${fault.affectedTasks} running tasks moved to the retry queue.`,
-    });
-    setTimeout(() => {
-      toast.success(`${target} recovered`, {
-        description: "Interrupted tasks were reassigned to healthy workers.",
+    try {
+      const result = await simulateFailure(target);
+      toast.error(`${target} stopped sending heartbeats`, {
+        description:
+          result.mode === "immediate"
+            ? `${result.affectedTasks} running tasks moved to the retry queue.`
+            : `The failure detector will mark it FAILED in ~${result.detectsInSeconds}s, then its tasks are requeued.`,
       });
-    }, 4800);
+    } catch {
+      toast.error("Could not reach the cluster", {
+        description: "The backend did not accept the failure injection.",
+      });
+    }
   };
 
   return (

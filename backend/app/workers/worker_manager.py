@@ -28,14 +28,14 @@ class WorkerClient:
         response.raise_for_status()
         return response.json()
 
-    async def heartbeat(self, cpu_usage: float, memory_usage: float, active_tasks: int) -> dict:
+    async def control(self) -> dict:
+        response = await self._client.get(f"/api/workers/{self.worker_id}/control")
+        response.raise_for_status()
+        return response.json()
+
+    async def heartbeat(self, metrics: dict) -> dict:
         response = await self._client.post(
-            f"/api/workers/{self.worker_id}/heartbeat",
-            json={
-                "cpu_usage": cpu_usage,
-                "memory_usage": memory_usage,
-                "active_tasks": active_tasks,
-            },
+            f"/api/workers/{self.worker_id}/heartbeat", json=metrics
         )
         if response.status_code == 409:
             return {"status": "FAILED"}

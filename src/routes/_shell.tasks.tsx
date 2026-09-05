@@ -6,7 +6,8 @@ import { TaskTable } from "@/components/clay/TaskTable";
 import { TaskDetailDrawer } from "@/components/clay/TaskDetailDrawer";
 import { MetricCard } from "@/components/clay/MetricCard";
 import { LoadingState, ErrorState } from "@/components/clay/StateViews";
-import { useSystem } from "@/hooks/useSystem";
+import { SubmitTaskDialog } from "@/components/clay/SubmitTaskDialog";
+import { useSystem, useSummary } from "@/hooks/useSystem";
 import { Activity, CheckCircle2, Clock, RotateCcw } from "lucide-react";
 import { formatNumber } from "@/lib/format";
 import type { Task } from "@/types";
@@ -32,6 +33,7 @@ export const Route = createFileRoute("/_shell/tasks")({
 
 function TasksPage() {
   const state = useSystem();
+  const summary = useSummary();
   const [selected, setSelected] = useState<Task | null>(null);
   const [failed, setFailed] = useState(false);
 
@@ -51,6 +53,7 @@ function TasksPage() {
       <PageHeader
         title="Task Queue"
         subtitle="Every task the scheduler is tracking, from submission through recovery."
+        actions={<SubmitTaskDialog />}
       />
 
       {state.tasks.length === 0 ? (
@@ -64,7 +67,7 @@ function TasksPage() {
               value={formatNumber(count("running"))}
               icon={Activity}
               tone="info"
-              change={4.2}
+              change={summary.trends.runningTasks}
             />
             <MetricCard
               index={1}
@@ -72,7 +75,7 @@ function TasksPage() {
               value={formatNumber(count("pending"))}
               icon={Clock}
               tone="warning"
-              change={-2.1}
+
             />
             <MetricCard
               index={2}
@@ -80,7 +83,7 @@ function TasksPage() {
               value={formatNumber(count("completed"))}
               icon={CheckCircle2}
               tone="success"
-              change={9.1}
+              change={summary.trends.completedTasks}
             />
             <MetricCard
               index={3}
@@ -88,7 +91,7 @@ function TasksPage() {
               value={formatNumber(count("retrying"))}
               icon={RotateCcw}
               tone="danger"
-              change={-3.4}
+              change={summary.trends.failedTasks}
             />
           </div>
 

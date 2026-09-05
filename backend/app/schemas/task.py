@@ -6,7 +6,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from app.models.task import TaskPriority, TaskStatus
 
-TASK_TYPES = ("CPU_TASK", "MEMORY_TASK", "SLEEP_TASK", "FAILURE_TASK", "RANDOM_TASK")
+TASK_TYPES = ("CPU_TASK", "MEMORY_TASK", "SLEEP_TASK", "FAILURE_TASK", "MIXED_TASK", "RANDOM_TASK")
 
 
 class TaskCreate(BaseModel):

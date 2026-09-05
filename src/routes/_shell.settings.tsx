@@ -39,8 +39,12 @@ export const Route = createFileRoute("/_shell/settings")({
 
 function SettingsPage() {
   const { scheduler } = useSystem();
-  const [apiUrl, setApiUrl] = useState("https://api.taskflow.internal");
-  const [wsUrl, setWsUrl] = useState("wss://api.taskflow.internal/ws/dashboard");
+  const [apiUrl, setApiUrl] = useState(
+    (import.meta.env["VITE_API_URL"] as string | undefined) ?? "http://localhost:8000",
+  );
+  const [wsUrl, setWsUrl] = useState(
+    (import.meta.env["VITE_WS_URL"] as string | undefined) ?? "ws://localhost:8000/ws/dashboard",
+  );
   const [retries, setRetries] = useState("3");
   const [heartbeat, setHeartbeat] = useState("5");
   const [alerts, setAlerts] = useState(true);

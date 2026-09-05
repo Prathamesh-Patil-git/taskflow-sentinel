@@ -1,4 +1,9 @@
+import { useState } from "react";
+import { toast } from "sonner";
+import { RotateCcw, XCircle } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
+import { cancelTask, retryTask, live } from "@/services/api";
 import { PriorityBadge, TaskStatusBadge } from "./StatusBadge";
 import { formatDateTime, formatDuration } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -22,6 +27,28 @@ export function TaskDetailDrawer({
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
+  const [busy, setBusy] = useState(false);
+
+  const act = async (kind: "retry" | "cancel") => {
+    if (!task) return;
+    setBusy(true);
+    try {
+      if (kind === "retry") {
+        await retryTask(task.id);
+        toast.success(`${task.id} requeued`, { description: "The scheduler will reassign it." });
+      } else {
+        await cancelTask(task.id);
+        toast.success(`${task.id} cancelled`);
+      }
+      await live.refresh();
+      onOpenChange(false);
+    } catch {
+      toast.error("The cluster rejected that action");
+    } finally {
+      setBusy(false);
+    }
+  };
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-full overflow-y-auto sm:max-w-xl">
@@ -95,6 +122,25 @@ export function TaskDetailDrawer({
                     status={task.status} worker={task.workerId ?? "none"}
                   </p>
                 </div>
+              </section>
+              <section className="flex flex-wrap gap-2">
+                <Button
+                  className="clay-press rounded-full"
+                  disabled={busy || task.status === "running" || task.status === "pending"}
+                  onClick={() => void act("retry")}
+                >
+                  <RotateCcw className="mr-2 h-4 w-4" aria-hidden="true" />
+                  Retry task
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="clay-press rounded-full"
+                  disabled={busy || task.status === "completed" || task.status === "failed"}
+                  onClick={() => void act("cancel")}
+                >
+                  <XCircle className="mr-2 h-4 w-4" aria-hidden="true" />
+                  Cancel task
+                </Button>
               </section>
             </div>
           </>

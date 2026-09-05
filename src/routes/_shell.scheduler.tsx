@@ -13,7 +13,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useSystem } from "@/hooks/useSystem";
-import { updateAlgorithm } from "@/services/api";
+import { toast } from "sonner";
+import { updateAlgorithm, live } from "@/services/api";
 import { formatNumber } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type { SchedulingAlgorithm } from "@/types";
@@ -46,6 +47,19 @@ const ALGORITHMS: { value: SchedulingAlgorithm; label: string; blurb: string }[]
 
 function SchedulerPage() {
   const { scheduler } = useSystem();
+
+  const switchAlgorithm = async (value: SchedulingAlgorithm) => {
+    try {
+      await updateAlgorithm(value);
+      await live.refresh();
+      toast.success("Scheduling policy updated", {
+        description: "New placements use this policy from the next cycle.",
+      });
+    } catch {
+      toast.error("Could not update the scheduling policy");
+    }
+  };
+
   const active = ALGORITHMS.find((a) => a.value === scheduler.algorithm);
 
   return (
@@ -56,7 +70,7 @@ function SchedulerPage() {
         actions={
           <Select
             value={scheduler.algorithm}
-            onValueChange={(v) => void updateAlgorithm(v as SchedulingAlgorithm)}
+            onValueChange={(v) => void switchAlgorithm(v as SchedulingAlgorithm)}
           >
             <SelectTrigger className="clay h-11 w-56 rounded-full border-0" aria-label="Scheduling algorithm">
               <SelectValue />
@@ -78,7 +92,6 @@ function SchedulerPage() {
           label="Scheduling Rate"
           value={`${scheduler.schedulingRate}/sec`}
           icon={Cpu}
-          change={3.1}
         />
         <MetricCard
           index={1}
@@ -86,7 +99,6 @@ function SchedulerPage() {
           value={`${scheduler.averageLatency} ms`}
           icon={Timer}
           tone="info"
-          change={-5.2}
         />
         <MetricCard
           index={2}
@@ -94,7 +106,6 @@ function SchedulerPage() {
           value={formatNumber(scheduler.queueDepth)}
           icon={Layers}
           tone="warning"
-          change={2.4}
         />
         <MetricCard
           index={3}
@@ -102,7 +113,6 @@ function SchedulerPage() {
           value={`${scheduler.efficiency}%`}
           icon={Gauge}
           tone="success"
-          change={1.6}
         />
       </div>
 
@@ -123,7 +133,7 @@ function SchedulerPage() {
               <button
                 key={a.value}
                 type="button"
-                onClick={() => void updateAlgorithm(a.value)}
+                onClick={() => void switchAlgorithm(a.value)}
                 className={cn(
                   "rounded-2xl px-4 py-3 text-left transition-all",
                   a.value === scheduler.algorithm

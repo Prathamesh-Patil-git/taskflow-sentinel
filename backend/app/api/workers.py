@@ -1,13 +1,19 @@
 """Worker registration, heartbeat, assignments, failure simulation and recovery."""
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
 from app.core.database import get_session
 from app.schemas.task import TaskOut
-from app.schemas.worker import HeartbeatIn, WorkerOut, WorkerRegisterIn, WorkerRegisterOut
+from app.schemas.worker import (
+    HeartbeatIn,
+    WorkerControl,
+    WorkerOut,
+    WorkerRegisterIn,
+    WorkerRegisterOut,
+)
 from app.services import fault_service, task_service, worker_service
 
 router = APIRouter(prefix="/api/workers", tags=["workers"])
@@ -52,9 +58,32 @@ async def assignments(worker_id: str, session: AsyncSession = Depends(get_sessio
     return await task_service.assignments_for_worker(session, worker_id)
 
 
+@router.get(
+    "/{worker_id}/control",
+    response_model=WorkerControl,
+    summary="Runtime kill-switch polled by the worker container",
+)
+async def control(worker_id: str):
+    return WorkerControl(
+        worker_id=worker_id,
+        paused=await worker_service.is_paused(worker_id),
+        heartbeat_interval=settings.heartbeat_interval,
+    )
+
+
 @router.post("/{worker_id}/simulate-failure", summary="Simulate a worker crash")
-async def simulate_failure(worker_id: str, session: AsyncSession = Depends(get_session)):
-    result = await fault_service.simulate_failure(session, worker_id)
+async def simulate_failure(
+    worker_id: str,
+    mode: str = Query(
+        default="detector",
+        pattern="^(detector|immediate)$",
+        description="detector = stop the real heartbeat and let the detector time it out",
+    ),
+    session: AsyncSession = Depends(get_session),
+):
+    result = await fault_service.simulate_failure(
+        session, worker_id, immediate=mode == "immediate"
+    )
     await session.commit()
     return result
 

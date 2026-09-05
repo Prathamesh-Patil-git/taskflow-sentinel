@@ -108,17 +108,16 @@ function FaultsPage() {
       </ClayCard>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <MetricCard index={0} label="Failures Today" value={String(today.length)} icon={ShieldAlert} tone="danger" change={-12} />
-        <MetricCard index={1} label="Recovered Automatically" value={String(recovered.length)} icon={ShieldCheck} tone="success" change={8} />
+        <MetricCard index={0} label="Failures Today" value={String(today.length)} icon={ShieldAlert} tone="danger" />
+        <MetricCard index={1} label="Recovered Automatically" value={String(recovered.length)} icon={ShieldCheck} tone="success" />
         <MetricCard
           index={2}
           label="Recovery Rate"
           value={`${today.length ? Math.round((recovered.length / today.length) * 100) : 100}%`}
           icon={RotateCcw}
           tone="info"
-          change={0}
         />
-        <MetricCard index={3} label="Avg Recovery Time" value={`${avgRecovery} sec`} icon={Timer} tone="warning" change={-6} />
+        <MetricCard index={3} label="Avg Recovery Time" value={`${avgRecovery} sec`} icon={Timer} tone="warning" />
       </div>
 
       <ClayCard>

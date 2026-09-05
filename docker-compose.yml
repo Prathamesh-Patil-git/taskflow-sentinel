@@ -1,0 +1,156 @@
+name: taskflow-sentinel
+
+x-worker-common: &worker-common
+  build:
+    context: ./backend
+    dockerfile: Dockerfile
+  image: taskflow-worker:latest
+  command: ["python", "-m", "app.workers.demo_worker"]
+  environment:
+    BACKEND_URL: http://backend:8000
+    HEARTBEAT_INTERVAL: ${HEARTBEAT_INTERVAL:-2}
+    WORKER_CONCURRENCY: ${WORKER_CONCURRENCY:-4}
+    PYTHONUNBUFFERED: "1"
+  depends_on:
+    backend:
+      condition: service_healthy
+  networks: [taskflow-network]
+  restart: unless-stopped
+  deploy:
+    resources:
+      limits:
+        cpus: "${WORKER_CPUS:-1}"
+        memory: ${WORKER_MEMORY_LIMIT:-1G}
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-taskflow}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-taskflow}
+      POSTGRES_DB: ${POSTGRES_DB:-taskflow}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-taskflow}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks: [taskflow-network]
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks: [taskflow-network]
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: taskflow-backend:latest
+    command: ["./entrypoint.sh"]
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql+asyncpg://taskflow:taskflow@postgres:5432/taskflow}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
+      API_HOST: 0.0.0.0
+      API_PORT: 8000
+      HEARTBEAT_INTERVAL: ${HEARTBEAT_INTERVAL:-2}
+      FAILURE_TIMEOUT: ${FAILURE_TIMEOUT:-6}
+      MAX_TASK_RETRIES: ${MAX_TASK_RETRIES:-3}
+      DEFAULT_SCHEDULING_ALGORITHM: ${DEFAULT_SCHEDULING_ALGORITHM:-RESOURCE_AWARE}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}
+      SEED_HISTORY: ${SEED_HISTORY:-true}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    ports:
+      - "${API_PORT:-8000}:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8000/health || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 20s
+    networks: [taskflow-network]
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    image: taskflow-frontend:latest
+    environment:
+      VITE_API_URL: ${VITE_API_URL:-http://localhost:8000}
+      VITE_WS_URL: ${VITE_WS_URL:-ws://localhost:8000/ws/dashboard}
+    ports:
+      - "${FRONTEND_PORT:-3000}:3000"
+    depends_on:
+      - backend
+    networks: [taskflow-network]
+
+  worker-01:
+    <<: *worker-common
+    environment:
+      WORKER_ID: worker-01
+      BACKEND_URL: http://backend:8000
+      WORKER_CONCURRENCY: ${WORKER_CONCURRENCY:-4}
+      PYTHONUNBUFFERED: "1"
+
+  worker-02:
+    <<: *worker-common
+    environment:
+      WORKER_ID: worker-02
+      BACKEND_URL: http://backend:8000
+      WORKER_CONCURRENCY: ${WORKER_CONCURRENCY:-4}
+      PYTHONUNBUFFERED: "1"
+
+  worker-03:
+    <<: *worker-common
+    environment:
+      WORKER_ID: worker-03
+      BACKEND_URL: http://backend:8000
+      WORKER_CONCURRENCY: ${WORKER_CONCURRENCY:-4}
+      PYTHONUNBUFFERED: "1"
+
+  worker-04:
+    <<: *worker-common
+    environment:
+      WORKER_ID: worker-04
+      BACKEND_URL: http://backend:8000
+      WORKER_CONCURRENCY: ${WORKER_CONCURRENCY:-4}
+      PYTHONUNBUFFERED: "1"
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    profiles: ["tools"]
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@taskflow.local}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-taskflow}
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+    ports:
+      - "${PGADMIN_PORT:-5050}:80"
+    depends_on:
+      - postgres
+    networks: [taskflow-network]
+
+volumes:
+  postgres-data:
+  redis-data:
+
+networks:
+  taskflow-network:
+    name: taskflow-network
+    driver: bridge
