@@ -38,7 +38,7 @@ export const Route = createFileRoute("/_shell/logs")({
   component: LogsPage,
 });
 
-const LEVELS: LogLevel[] = ["info", "warning", "error", "critical"];
+const LEVELS: LogLevel[] = ["INFO", "WARNING", "ERROR", "CRITICAL"];
 
 function LogsPage() {
   const { logs, workers } = useSystem();
