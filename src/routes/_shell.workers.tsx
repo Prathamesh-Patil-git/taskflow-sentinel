@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { ShieldAlert } from "lucide-react";
+import { toast } from "sonner";
 import { PageHeader } from "@/components/clay/PageHeader";
 import { ClayCard, ClaySectionHeader } from "@/components/clay/ClayCard";
 import { WorkerCard } from "@/components/clay/WorkerCard";
@@ -10,6 +11,7 @@ import { ClusterTopology } from "@/components/clay/ClusterTopology";
 import { EmptyState } from "@/components/clay/StateViews";
 import { Button } from "@/components/ui/button";
 import { useSystem } from "@/hooks/useSystem";
+import { recoverWorker } from "@/services/api";
 import type { Worker } from "@/types";
 
 export const Route = createFileRoute("/_shell/workers")({
@@ -36,6 +38,19 @@ function WorkersPage() {
   const [selected, setSelected] = useState<Worker | null>(null);
   const [simOpen, setSimOpen] = useState(false);
   const [simFor, setSimFor] = useState<string | undefined>();
+
+  const handleRecover = async (worker: Worker) => {
+    try {
+      await recoverWorker(worker.id);
+      toast.success(`Recovering worker ${worker.id}`, {
+        description: "The worker is re-registering with the cluster.",
+      });
+    } catch {
+      toast.error(`Could not recover ${worker.id}`, {
+        description: "The backend did not accept the recovery request.",
+      });
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -71,6 +86,7 @@ function WorkersPage() {
                 setSimFor(worker.id);
                 setSimOpen(true);
               }}
+              onRecoverWorker={handleRecover}
             />
           ))}
         </div>
@@ -91,6 +107,7 @@ function WorkersPage() {
           setSimFor(w.id);
           setSimOpen(true);
         }}
+        onRecoverWorker={handleRecover}
       />
       <FailureSimulationModal
         workers={state.workers}

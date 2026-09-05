@@ -16,11 +16,13 @@ export function WorkerCard({
   index = 0,
   onInspect,
   onSimulateFailure,
+  onRecoverWorker,
 }: {
   worker: Worker;
   index?: number;
   onInspect?: (worker: Worker) => void;
   onSimulateFailure?: (worker: Worker) => void;
+  onRecoverWorker?: (worker: Worker) => void;
 }) {
   return (
     <motion.article
@@ -50,9 +52,16 @@ export function WorkerCard({
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="rounded-2xl">
               <DropdownMenuItem onClick={() => onInspect?.(worker)}>View details</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onSimulateFailure?.(worker)}>
-                Simulate failure
-              </DropdownMenuItem>
+              {worker.status !== "failed" && worker.status !== "offline" && (
+                <DropdownMenuItem onClick={() => onSimulateFailure?.(worker)}>
+                  Simulate failure
+                </DropdownMenuItem>
+              )}
+              {(worker.status === "failed" || worker.status === "offline") && onRecoverWorker && (
+                <DropdownMenuItem onClick={() => onRecoverWorker?.(worker)}>
+                  Recover worker
+                </DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

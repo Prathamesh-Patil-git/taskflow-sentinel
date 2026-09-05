@@ -17,6 +17,7 @@ export function WorkerDetailDrawer({
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSimulateFailure?: (worker: Worker) => void;
+  onRecoverWorker?: (worker: Worker) => void;
 }) {
   const assigned = worker ? tasks.filter((t) => t.workerId === worker.id).slice(0, 8) : [];
 
@@ -84,13 +85,22 @@ export function WorkerDetailDrawer({
                 )}
               </section>
 
-              {onSimulateFailure && worker.status !== "failed" ? (
+              {onSimulateFailure && worker.status !== "failed" && worker.status !== "offline" ? (
                 <Button
                   variant="destructive"
                   className="clay-press w-full rounded-full"
                   onClick={() => onSimulateFailure(worker)}
                 >
                   Simulate failure on {worker.id}
+                </Button>
+              ) : null}
+              {onRecoverWorker && (worker.status === "failed" || worker.status === "offline") ? (
+                <Button
+                  variant="default"
+                  className="clay-press w-full rounded-full bg-success hover:bg-success/90"
+                  onClick={() => onRecoverWorker(worker)}
+                >
+                  Recover worker {worker.id}
                 </Button>
               ) : null}
             </div>
