@@ -53,7 +53,12 @@ function LogsPage() {
       logs.filter((l) => {
         if (level !== "all" && l.level !== level) return false;
         if (worker !== "all" && l.workerId !== worker) return false;
-        if (query && !`${l.message} ${l.component} ${l.workerId ?? ""}`.toLowerCase().includes(query.toLowerCase()))
+        if (
+          query &&
+          !`${l.message} ${l.component} ${l.workerId ?? ""}`
+            .toLowerCase()
+            .includes(query.toLowerCase())
+        )
           return false;
         return true;
       }),
@@ -91,7 +96,10 @@ function LogsPage() {
             />
           </div>
           <Select value={level} onValueChange={setLevel}>
-            <SelectTrigger className="clay h-11 w-40 rounded-full border-0" aria-label="Filter by level">
+            <SelectTrigger
+              className="clay h-11 w-40 rounded-full border-0"
+              aria-label="Filter by level"
+            >
               <SelectValue placeholder="Level" />
             </SelectTrigger>
             <SelectContent className="rounded-2xl">
@@ -104,7 +112,10 @@ function LogsPage() {
             </SelectContent>
           </Select>
           <Select value={worker} onValueChange={setWorker}>
-            <SelectTrigger className="clay h-11 w-44 rounded-full border-0" aria-label="Filter by worker">
+            <SelectTrigger
+              className="clay h-11 w-44 rounded-full border-0"
+              aria-label="Filter by worker"
+            >
               <SelectValue placeholder="Worker" />
             </SelectTrigger>
             <SelectContent className="rounded-2xl">
@@ -126,7 +137,10 @@ function LogsPage() {
         </div>
 
         {filtered.length === 0 ? (
-          <EmptyState title="No matching log entries" description="Adjust the filters or search term." />
+          <EmptyState
+            title="No matching log entries"
+            description="Adjust the filters or search term."
+          />
         ) : (
           <div className="scrollbar-clay clay-inset max-h-[560px] overflow-y-auto p-2 font-mono text-xs">
             <ul className="space-y-1">

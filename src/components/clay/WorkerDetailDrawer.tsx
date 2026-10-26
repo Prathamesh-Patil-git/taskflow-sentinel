@@ -73,9 +73,14 @@ export function WorkerDetailDrawer({
                 {assigned.length ? (
                   <ul className="space-y-2">
                     {assigned.map((t) => (
-                      <li key={t.id} className="clay-inset flex items-center justify-between px-4 py-2.5">
+                      <li
+                        key={t.id}
+                        className="clay-inset flex items-center justify-between px-4 py-2.5"
+                      >
                         <span className="font-mono text-xs">{t.id}</span>
-                        <span className="truncate px-3 text-sm text-muted-foreground">{t.name}</span>
+                        <span className="truncate px-3 text-sm text-muted-foreground">
+                          {t.name}
+                        </span>
                         <TaskStatusBadge status={t.status} />
                       </li>
                     ))}

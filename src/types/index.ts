@@ -35,10 +35,7 @@ export interface Task {
 }
 
 export type SchedulingAlgorithm =
-  | "round-robin"
-  | "least-loaded"
-  | "resource-aware"
-  | "priority-based";
+  "round-robin" | "least-loaded" | "resource-aware" | "priority-based";
 
 export interface SchedulerState {
   algorithm: SchedulingAlgorithm;

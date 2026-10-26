@@ -108,8 +108,20 @@ function FaultsPage() {
       </ClayCard>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <MetricCard index={0} label="Failures Today" value={String(today.length)} icon={ShieldAlert} tone="danger" />
-        <MetricCard index={1} label="Recovered Automatically" value={String(recovered.length)} icon={ShieldCheck} tone="success" />
+        <MetricCard
+          index={0}
+          label="Failures Today"
+          value={String(today.length)}
+          icon={ShieldAlert}
+          tone="danger"
+        />
+        <MetricCard
+          index={1}
+          label="Recovered Automatically"
+          value={String(recovered.length)}
+          icon={ShieldCheck}
+          tone="success"
+        />
         <MetricCard
           index={2}
           label="Recovery Rate"
@@ -117,7 +129,13 @@ function FaultsPage() {
           icon={RotateCcw}
           tone="info"
         />
-        <MetricCard index={3} label="Avg Recovery Time" value={`${avgRecovery} sec`} icon={Timer} tone="warning" />
+        <MetricCard
+          index={3}
+          label="Avg Recovery Time"
+          value={`${avgRecovery} sec`}
+          icon={Timer}
+          tone="warning"
+        />
       </div>
 
       <ClayCard>
@@ -147,7 +165,10 @@ function FaultsPage() {
                 {stage}
               </span>
               {i < STAGES.length - 1 ? (
-                <ArrowDown className="h-3.5 w-3.5 -rotate-90 text-muted-foreground" aria-hidden="true" />
+                <ArrowDown
+                  className="h-3.5 w-3.5 -rotate-90 text-muted-foreground"
+                  aria-hidden="true"
+                />
               ) : null}
             </motion.div>
           ))}
@@ -172,7 +193,10 @@ function FaultsPage() {
       <ClayCard>
         <ClaySectionHeader title="Fault Event Timeline" description="Newest incidents first" />
         {faults.length === 0 ? (
-          <EmptyState title="No faults recorded" description="Incidents appear here as soon as a node degrades." />
+          <EmptyState
+            title="No faults recorded"
+            description="Incidents appear here as soon as a node degrades."
+          />
         ) : (
           <div className="space-y-6">
             {faults.slice(0, 4).map((f) => (
@@ -184,7 +208,13 @@ function FaultsPage() {
                   </span>
                   <StatusBadge
                     label={f.status}
-                    tone={f.status === "recovered" ? "success" : f.status === "active" ? "danger" : "warning"}
+                    tone={
+                      f.status === "recovered"
+                        ? "success"
+                        : f.status === "active"
+                          ? "danger"
+                          : "warning"
+                    }
                   />
                   <span className="ml-auto text-xs text-muted-foreground">
                     {formatDateTime(f.timestamp)} · {f.affectedTasks} tasks affected

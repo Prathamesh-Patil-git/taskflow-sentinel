@@ -118,9 +118,7 @@ export function CircularGauge({
           {label}
         </span>
       ) : null}
-      {caption ? (
-        <p className="mt-2 text-center text-xs text-muted-foreground">{caption}</p>
-      ) : null}
+      {caption ? <p className="mt-2 text-center text-xs text-muted-foreground">{caption}</p> : null}
     </div>
   );
 }

@@ -68,7 +68,10 @@ export function FailureSimulationModal({
         </DialogHeader>
 
         <Select value={workerId} onValueChange={setWorkerId}>
-          <SelectTrigger className="clay-inset h-11 rounded-2xl border-0" aria-label="Select worker">
+          <SelectTrigger
+            className="clay-inset h-11 rounded-2xl border-0"
+            aria-label="Select worker"
+          >
             <SelectValue placeholder="Select worker" />
           </SelectTrigger>
           <SelectContent className="rounded-2xl">

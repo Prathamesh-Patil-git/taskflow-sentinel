@@ -148,13 +148,19 @@ function LoginPage() {
                 className="clay-inset h-11 rounded-2xl border-0"
               />
             </div>
-            <Button type="submit" className="clay-press mt-2 h-11 w-full rounded-full text-sm font-semibold">
+            <Button
+              type="submit"
+              className="clay-press mt-2 h-11 w-full rounded-full text-sm font-semibold"
+            >
               Enter dashboard
               <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />
             </Button>
             <p className="text-center text-xs text-muted-foreground">
               Demo environment — any credentials open the{" "}
-              <Link to="/dashboard" className="font-medium text-primary underline-offset-4 hover:underline">
+              <Link
+                to="/dashboard"
+                className="font-medium text-primary underline-offset-4 hover:underline"
+              >
                 live dashboard
               </Link>
               .

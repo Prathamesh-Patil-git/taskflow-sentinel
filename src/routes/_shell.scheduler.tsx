@@ -72,7 +72,10 @@ function SchedulerPage() {
             value={scheduler.algorithm}
             onValueChange={(v) => void switchAlgorithm(v as SchedulingAlgorithm)}
           >
-            <SelectTrigger className="clay h-11 w-56 rounded-full border-0" aria-label="Scheduling algorithm">
+            <SelectTrigger
+              className="clay h-11 w-56 rounded-full border-0"
+              aria-label="Scheduling algorithm"
+            >
               <SelectValue />
             </SelectTrigger>
             <SelectContent className="rounded-2xl">

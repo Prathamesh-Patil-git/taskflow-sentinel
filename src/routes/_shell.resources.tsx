@@ -59,7 +59,10 @@ function ResourcesPage() {
     [series],
   );
 
-  const distribution = workers.map((w) => ({ label: w.id.replace("worker-", "W"), tasks: w.activeTasks }));
+  const distribution = workers.map((w) => ({
+    label: w.id.replace("worker-", "W"),
+    tasks: w.activeTasks,
+  }));
 
   return (
     <div className="space-y-6">
@@ -70,16 +73,36 @@ function ResourcesPage() {
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <ClayCard className="flex justify-center">
-          <CircularGauge value={cpu} label="CPU" tone={toneForValue(cpu)} caption="Allocated vCPU" />
+          <CircularGauge
+            value={cpu}
+            label="CPU"
+            tone={toneForValue(cpu)}
+            caption="Allocated vCPU"
+          />
         </ClayCard>
         <ClayCard className="flex justify-center">
-          <CircularGauge value={memory} label="Memory" tone={toneForValue(memory)} caption="Allocated RAM" />
+          <CircularGauge
+            value={memory}
+            label="Memory"
+            tone={toneForValue(memory)}
+            caption="Allocated RAM"
+          />
         </ClayCard>
         <ClayCard className="flex justify-center">
-          <CircularGauge value={storage} label="Storage" tone={toneForValue(storage)} caption="Persistent volumes" />
+          <CircularGauge
+            value={storage}
+            label="Storage"
+            tone={toneForValue(storage)}
+            caption="Persistent volumes"
+          />
         </ClayCard>
         <ClayCard className="flex justify-center">
-          <CircularGauge value={network} label="Network" tone={toneForValue(network)} caption="Egress saturation" />
+          <CircularGauge
+            value={network}
+            label="Network"
+            tone={toneForValue(network)}
+            caption="Egress saturation"
+          />
         </ClayCard>
       </div>
 
@@ -125,7 +148,11 @@ function ResourcesPage() {
                       <span
                         className={cn(
                           "text-xs font-semibold",
-                          load > 85 ? "text-destructive" : load > 70 ? "text-warning" : "text-success",
+                          load > 85
+                            ? "text-destructive"
+                            : load > 70
+                              ? "text-warning"
+                              : "text-success",
                         )}
                       >
                         {load}%

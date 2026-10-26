@@ -26,7 +26,12 @@ export function HealthIndicator({
       </div>
       <span className={cn("flex shrink-0 items-center gap-2 text-xs font-semibold", t.text)}>
         <span className="relative flex h-2 w-2">
-          <span className={cn("absolute inline-flex h-full w-full animate-ping rounded-full opacity-70", t.dot)} />
+          <span
+            className={cn(
+              "absolute inline-flex h-full w-full animate-ping rounded-full opacity-70",
+              t.dot,
+            )}
+          />
           <span className={cn("relative inline-flex h-2 w-2 rounded-full", t.dot)} />
         </span>
         {t.label}

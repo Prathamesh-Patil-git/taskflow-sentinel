@@ -91,7 +91,9 @@ export function TaskDetailDrawer({
                         key={stage}
                         className={cn(
                           "flex items-center gap-3 rounded-2xl px-4 py-2.5 text-sm",
-                          active ? "clay font-semibold text-primary" : "clay-inset text-muted-foreground",
+                          active
+                            ? "clay font-semibold text-primary"
+                            : "clay-inset text-muted-foreground",
                         )}
                       >
                         <span

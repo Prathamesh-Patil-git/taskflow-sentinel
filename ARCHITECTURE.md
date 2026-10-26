@@ -49,15 +49,15 @@ TaskFlow Sentinel is a **fault-tolerant distributed task scheduling and resource
 
 ### 1. Backend (FastAPI + Python)
 
-| Module | Path | Responsibility |
-|---|---|---|
-| **API Layer** | `backend/app/api/` | REST endpoints for tasks, workers, scheduler, faults, analytics, logs, health |
-| **Models** | `backend/app/models/` | SQLAlchemy ORM: `Task`, `Worker`, `Fault`, `SchedulerConfig`, `SystemEvent`, `TaskAttempt` |
-| **Services** | `backend/app/services/` | Business logic: task lifecycle, worker management, fault handling, recovery, analytics |
-| **Scheduler** | `backend/app/scheduler/` | Priority queue + pluggable strategies (Round Robin, Least Loaded, Resource Aware, Priority Based) |
-| **Fault Tolerance** | `backend/app/fault_tolerance/` | Heartbeat monitoring, failure detection, automatic task recovery |
-| **WebSocket** | `backend/app/websocket/` | Real-time event broadcast to dashboard clients |
-| **Core** | `backend/app/core/` | Config, database engine, Redis gateway, structured logging |
+| Module              | Path                           | Responsibility                                                                                    |
+| ------------------- | ------------------------------ | ------------------------------------------------------------------------------------------------- |
+| **API Layer**       | `backend/app/api/`             | REST endpoints for tasks, workers, scheduler, faults, analytics, logs, health                     |
+| **Models**          | `backend/app/models/`          | SQLAlchemy ORM: `Task`, `Worker`, `Fault`, `SchedulerConfig`, `SystemEvent`, `TaskAttempt`        |
+| **Services**        | `backend/app/services/`        | Business logic: task lifecycle, worker management, fault handling, recovery, analytics            |
+| **Scheduler**       | `backend/app/scheduler/`       | Priority queue + pluggable strategies (Round Robin, Least Loaded, Resource Aware, Priority Based) |
+| **Fault Tolerance** | `backend/app/fault_tolerance/` | Heartbeat monitoring, failure detection, automatic task recovery                                  |
+| **WebSocket**       | `backend/app/websocket/`       | Real-time event broadcast to dashboard clients                                                    |
+| **Core**            | `backend/app/core/`            | Config, database engine, Redis gateway, structured logging                                        |
 
 ### 2. Worker Containers
 
@@ -72,13 +72,13 @@ Each worker (`worker-01` through `worker-04`) runs `python -m app.workers.demo_w
 
 ### 3. Frontend (React + Vite + TanStack)
 
-| Layer | File | Role |
-|---|---|---|
-| **Live Store** | `src/services/live.ts` | Single source of truth — fetches from REST + subscribes to WebSocket events |
-| **API Client** | `src/services/api.ts` | Typed Axios layer with snake_case → camelCase mappers |
-| **WebSocket** | `src/services/websocket.ts` | Auto-reconnecting WS client for `/ws/dashboard` |
-| **Hooks** | `src/hooks/useSystem.ts` | React hook exposing live cluster state |
-| **Pages** | `src/routes/_shell.*.tsx` | Dashboard, Tasks, Workers, Scheduler, Resources, Faults, Analytics, Logs, Settings |
+| Layer          | File                        | Role                                                                               |
+| -------------- | --------------------------- | ---------------------------------------------------------------------------------- |
+| **Live Store** | `src/services/live.ts`      | Single source of truth — fetches from REST + subscribes to WebSocket events        |
+| **API Client** | `src/services/api.ts`       | Typed Axios layer with snake_case → camelCase mappers                              |
+| **WebSocket**  | `src/services/websocket.ts` | Auto-reconnecting WS client for `/ws/dashboard`                                    |
+| **Hooks**      | `src/hooks/useSystem.ts`    | React hook exposing live cluster state                                             |
+| **Pages**      | `src/routes/_shell.*.tsx`   | Dashboard, Tasks, Workers, Scheduler, Resources, Faults, Analytics, Logs, Settings |
 
 ---
 
@@ -109,12 +109,12 @@ Each worker (`worker-01` through `worker-04`) runs `python -m app.workers.demo_w
 
 ## Scheduling Algorithms
 
-| Algorithm | Strategy | Selection Logic |
-|---|---|---|
-| **Round Robin** | `round_robin.py` | Cycles through eligible workers sequentially |
-| **Least Loaded** | `least_loaded.py` | Picks worker with fewest active tasks |
-| **Resource Aware** | `resource_aware.py` | Scores by available CPU + memory headroom (default) |
-| **Priority Based** | `priority.py` | Weights worker reliability + resource fit for critical tasks |
+| Algorithm          | Strategy            | Selection Logic                                              |
+| ------------------ | ------------------- | ------------------------------------------------------------ |
+| **Round Robin**    | `round_robin.py`    | Cycles through eligible workers sequentially                 |
+| **Least Loaded**   | `least_loaded.py`   | Picks worker with fewest active tasks                        |
+| **Resource Aware** | `resource_aware.py` | Scores by available CPU + memory headroom (default)          |
+| **Priority Based** | `priority.py`       | Weights worker reliability + resource fit for critical tasks |
 
 All strategies implement `SchedulerStrategy` (abstract base) with `score()` and `select_worker()` methods. Swappable at runtime via the Settings page or `PUT /api/scheduler/algorithm`.
 
@@ -157,27 +157,27 @@ Scheduler picks up → assigns to healthy worker → task resumes
 
 ## Database Schema (PostgreSQL)
 
-| Table | Key Columns | Purpose |
-|---|---|---|
-| `tasks` | task_id, name, priority, status, cpu_required, memory_required, assigned_worker_id, retry_count | Task lifecycle |
-| `workers` | worker_id, hostname, status, cpu_capacity, cpu_usage, memory_capacity, memory_usage, last_heartbeat | Worker state |
-| `faults` | fault_id, worker_id, fault_type, severity, status, affected_tasks, recovery_time | Fault history |
-| `task_attempts` | task_id, worker_id, attempt_number, status, execution_time | Execution audit trail |
-| `system_events` | event_type, component, level, message, event_metadata | System log / timeline |
-| `scheduler_config` | algorithm, tasks_scheduled, successful/rejected assignments, total_scheduling_latency | Scheduler metrics |
+| Table              | Key Columns                                                                                         | Purpose               |
+| ------------------ | --------------------------------------------------------------------------------------------------- | --------------------- |
+| `tasks`            | task_id, name, priority, status, cpu_required, memory_required, assigned_worker_id, retry_count     | Task lifecycle        |
+| `workers`          | worker_id, hostname, status, cpu_capacity, cpu_usage, memory_capacity, memory_usage, last_heartbeat | Worker state          |
+| `faults`           | fault_id, worker_id, fault_type, severity, status, affected_tasks, recovery_time                    | Fault history         |
+| `task_attempts`    | task_id, worker_id, attempt_number, status, execution_time                                          | Execution audit trail |
+| `system_events`    | event_type, component, level, message, event_metadata                                               | System log / timeline |
+| `scheduler_config` | algorithm, tasks_scheduled, successful/rejected assignments, total_scheduling_latency               | Scheduler metrics     |
 
 ---
 
 ## Redis Usage
 
-| Key Pattern | Data Structure | Purpose |
-|---|---|---|
-| `taskflow:queue:pending` | Sorted Set (score = priority weight) | Priority queue for pending tasks |
-| `taskflow:worker:{id}` | String (JSON) | Cached worker state for fast reads |
-| `taskflow:heartbeat:{id}` | String (TTL 60s) | Heartbeat liveness marker |
-| `taskflow:locks:task:{id}` | String (NX, TTL 30s) | Distributed lock preventing duplicate scheduling |
-| `taskflow:worker:{id}:paused` | String | Kill-switch for simulated failures |
-| `taskflow:events` | Pub/Sub channel | Real-time event broadcast |
+| Key Pattern                   | Data Structure                       | Purpose                                          |
+| ----------------------------- | ------------------------------------ | ------------------------------------------------ |
+| `taskflow:queue:pending`      | Sorted Set (score = priority weight) | Priority queue for pending tasks                 |
+| `taskflow:worker:{id}`        | String (JSON)                        | Cached worker state for fast reads               |
+| `taskflow:heartbeat:{id}`     | String (TTL 60s)                     | Heartbeat liveness marker                        |
+| `taskflow:locks:task:{id}`    | String (NX, TTL 30s)                 | Distributed lock preventing duplicate scheduling |
+| `taskflow:worker:{id}:paused` | String                               | Kill-switch for simulated failures               |
+| `taskflow:events`             | Pub/Sub channel                      | Real-time event broadcast                        |
 
 ---
 
@@ -185,10 +185,10 @@ Scheduler picks up → assigns to healthy worker → task resumes
 
 All containers communicate on `taskflow-network` (Docker bridge). Service discovery uses Docker DNS:
 
-| Service | Internal Hostname | Exposed Port |
-|---|---|---|
-| PostgreSQL | `postgres` | 5432 |
-| Redis | `redis` | 6379 |
-| Backend API | `backend` | 8000 |
-| Frontend | `frontend` | 3000 |
-| Workers | `worker-01` .. `worker-04` | (internal only) |
+| Service     | Internal Hostname          | Exposed Port    |
+| ----------- | -------------------------- | --------------- |
+| PostgreSQL  | `postgres`                 | 5432            |
+| Redis       | `redis`                    | 6379            |
+| Backend API | `backend`                  | 8000            |
+| Frontend    | `frontend`                 | 3000            |
+| Workers     | `worker-01` .. `worker-04` | (internal only) |

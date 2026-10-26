@@ -4,7 +4,12 @@ const CACHE = "taskflow-shell-v1";
 const SHELL = ["/", "/manifest.webmanifest", "/favicon.ico"];
 
 self.addEventListener("install", (event) => {
-  event.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting()));
+  event.waitUntil(
+    caches
+      .open(CACHE)
+      .then((c) => c.addAll(SHELL))
+      .then(() => self.skipWaiting()),
+  );
 });
 
 self.addEventListener("activate", (event) => {
@@ -25,7 +30,10 @@ self.addEventListener("fetch", (event) => {
     fetch(event.request)
       .then((response) => {
         const copy = response.clone();
-        caches.open(CACHE).then((c) => c.put(event.request, copy)).catch(() => {});
+        caches
+          .open(CACHE)
+          .then((c) => c.put(event.request, copy))
+          .catch(() => {});
         return response;
       })
       .catch(() => caches.match(event.request).then((hit) => hit ?? caches.match("/"))),

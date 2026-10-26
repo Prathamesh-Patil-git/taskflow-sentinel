@@ -101,15 +101,14 @@
   /* clay elevation */
   --clay-light: oklch(1 0 0 / 90%);
   --clay-shadow: 264 20% 55%;
-  --clay-out: 0 18px 40px -22px oklch(0.4 0.06 265 / 45%), 0 6px 14px -8px oklch(0.4 0.06 265 / 25%);
-  --clay-out-lg: 0 30px 60px -28px oklch(0.4 0.06 265 / 50%), 0 10px 22px -12px oklch(0.4 0.06 265 / 26%);
+  --clay-out:
+    0 18px 40px -22px oklch(0.4 0.06 265 / 45%), 0 6px 14px -8px oklch(0.4 0.06 265 / 25%);
+  --clay-out-lg:
+    0 30px 60px -28px oklch(0.4 0.06 265 / 50%), 0 10px 22px -12px oklch(0.4 0.06 265 / 26%);
   --clay-in: inset 0 2px 3px oklch(1 0 0 / 90%), inset 0 -3px 6px oklch(0.55 0.05 265 / 12%);
   --clay-press: inset 0 3px 8px oklch(0.55 0.05 265 / 22%), inset 0 -1px 2px oklch(1 0 0 / 70%);
-  --gradient-app: radial-gradient(
-      1200px 600px at 15% -10%,
-      oklch(0.93 0.04 285 / 70%),
-      transparent 60%
-    ),
+  --gradient-app:
+    radial-gradient(1200px 600px at 15% -10%, oklch(0.93 0.04 285 / 70%), transparent 60%),
     radial-gradient(900px 500px at 100% 0%, oklch(0.94 0.03 220 / 60%), transparent 55%);
 }
 
@@ -157,7 +156,8 @@
   --clay-out-lg: 0 34px 70px -30px oklch(0 0 0 / 80%), 0 12px 26px -14px oklch(0 0 0 / 55%);
   --clay-in: inset 0 1px 1px oklch(1 0 0 / 8%), inset 0 -3px 8px oklch(0 0 0 / 35%);
   --clay-press: inset 0 4px 10px oklch(0 0 0 / 55%), inset 0 -1px 2px oklch(1 0 0 / 6%);
-  --gradient-app: radial-gradient(1100px 560px at 12% -10%, oklch(0.35 0.08 288 / 45%), transparent 60%),
+  --gradient-app:
+    radial-gradient(1100px 560px at 12% -10%, oklch(0.35 0.08 288 / 45%), transparent 60%),
     radial-gradient(900px 500px at 100% 0%, oklch(0.3 0.06 230 / 40%), transparent 55%);
 }
 

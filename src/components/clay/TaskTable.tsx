@@ -28,13 +28,7 @@ type SortKey = "id" | "priority" | "duration" | "createdAt";
 const PRIORITY_ORDER = { critical: 0, high: 1, medium: 2, low: 3 } as const;
 const PAGE_SIZE = 8;
 
-export function TaskTable({
-  tasks,
-  onSelect,
-}: {
-  tasks: Task[];
-  onSelect?: (task: Task) => void;
-}) {
+export function TaskTable({ tasks, onSelect }: { tasks: Task[]; onSelect?: (task: Task) => void }) {
   const [tab, setTab] = useState<TaskStatus | "all">("all");
   const [query, setQuery] = useState("");
   const [priority, setPriority] = useState<string>("all");
@@ -135,7 +129,10 @@ export function TaskTable({
               setPage(0);
             }}
           >
-            <SelectTrigger className="clay-inset h-9 w-36 rounded-full border-0" aria-label="Filter by priority">
+            <SelectTrigger
+              className="clay-inset h-9 w-36 rounded-full border-0"
+              aria-label="Filter by priority"
+            >
               <SelectValue placeholder="Priority" />
             </SelectTrigger>
             <SelectContent className="rounded-2xl">
@@ -150,7 +147,10 @@ export function TaskTable({
       </div>
 
       {rows.length === 0 ? (
-        <EmptyState title="No tasks match these filters" description="Adjust the search, tab or priority filter." />
+        <EmptyState
+          title="No tasks match these filters"
+          description="Adjust the search, tab or priority filter."
+        />
       ) : (
         <div className="scrollbar-clay overflow-x-auto">
           <table className="w-full min-w-[860px] border-separate border-spacing-y-2 text-sm">
@@ -189,7 +189,9 @@ export function TaskTable({
                   </td>
                   <td className="tabular-nums text-muted-foreground">{task.cpuRequired} CPU</td>
                   <td className="tabular-nums text-muted-foreground">{task.memoryRequired} GB</td>
-                  <td className="font-mono text-xs text-muted-foreground">{task.workerId ?? "—"}</td>
+                  <td className="font-mono text-xs text-muted-foreground">
+                    {task.workerId ?? "—"}
+                  </td>
                   <td>
                     <TaskStatusBadge status={task.status} />
                   </td>
@@ -208,7 +210,8 @@ export function TaskTable({
 
       <div className="flex items-center justify-between gap-3 text-xs text-muted-foreground">
         <span>
-          {filtered.length} task{filtered.length === 1 ? "" : "s"} · page {current + 1} of {pageCount}
+          {filtered.length} task{filtered.length === 1 ? "" : "s"} · page {current + 1} of{" "}
+          {pageCount}
         </span>
         <div className="flex gap-2">
           <Button

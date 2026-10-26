@@ -1,14 +1,6 @@
 import { useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import {
-  Activity,
-  CheckCircle2,
-  Layers,
-  RefreshCw,
-  Server,
-  XCircle,
-  Zap,
-} from "lucide-react";
+import { Activity, CheckCircle2, Layers, RefreshCw, Server, XCircle, Zap } from "lucide-react";
 import { PageHeader } from "@/components/clay/PageHeader";
 import { MetricCard } from "@/components/clay/MetricCard";
 import { CircularGauge, toneForValue } from "@/components/clay/CircularGauge";
@@ -207,7 +199,13 @@ function DashboardPage() {
           <CircularGauge
             value={summary.systemHealth}
             label="System health"
-            tone={summary.systemHealth >= 90 ? "success" : summary.systemHealth >= 70 ? "warning" : "danger"}
+            tone={
+              summary.systemHealth >= 90
+                ? "success"
+                : summary.systemHealth >= 70
+                  ? "warning"
+                  : "danger"
+            }
             caption="Composite of workers, queue and storage"
           />
         </ClayCard>
@@ -263,7 +261,9 @@ function DashboardPage() {
             <HealthIndicator
               name="Database"
               state={healthState(health["database"])}
-              detail={health["database"] === "HEALTHY" ? "PostgreSQL reachable" : "Connection issue"}
+              detail={
+                health["database"] === "HEALTHY" ? "PostgreSQL reachable" : "Connection issue"
+              }
             />
             <HealthIndicator
               name="Redis"
@@ -286,7 +286,9 @@ function DashboardPage() {
                     onClick={() => setRange(r)}
                     className={cn(
                       "rounded-full px-3 py-1 text-xs font-semibold transition-colors",
-                      range === r ? "clay text-primary" : "text-muted-foreground hover:text-foreground",
+                      range === r
+                        ? "clay text-primary"
+                        : "text-muted-foreground hover:text-foreground",
                     )}
                     aria-pressed={range === r}
                   >

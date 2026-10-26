@@ -73,7 +73,10 @@ function WorkersPage() {
       />
 
       {state.workers.length === 0 ? (
-        <EmptyState title="No workers registered" description="Nodes appear here once they join the cluster." />
+        <EmptyState
+          title="No workers registered"
+          description="Nodes appear here once they join the cluster."
+        />
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {state.workers.map((w, i) => (
@@ -93,7 +96,10 @@ function WorkersPage() {
       )}
 
       <ClayCard>
-        <ClaySectionHeader title="Cluster Topology" description="Scheduler fan-out and node status" />
+        <ClaySectionHeader
+          title="Cluster Topology"
+          description="Scheduler fan-out and node status"
+        />
         <ClusterTopology workers={state.workers} />
       </ClayCard>
 

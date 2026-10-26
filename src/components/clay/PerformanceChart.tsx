@@ -168,7 +168,11 @@ export function LegendPills({ series }: { series: SeriesConfig[] }) {
           key={s.key}
           className="clay-inset flex items-center gap-2 px-3 py-1 text-xs font-medium text-muted-foreground"
         >
-          <span className="h-2 w-2 rounded-full" style={{ background: s.color }} aria-hidden="true" />
+          <span
+            className="h-2 w-2 rounded-full"
+            style={{ background: s.color }}
+            aria-hidden="true"
+          />
           {s.label}
         </span>
       ))}

@@ -41,7 +41,6 @@ const ALGO_SERIES = [
   { key: "latency", label: "Sched. latency (ms)", color: "var(--warning)" },
 ];
 
-
 const THROUGHPUT_SERIES = [{ key: "throughput", label: "Tasks/min", color: "var(--primary)" }];
 const OUTCOME_SERIES = [
   { key: "completed", label: "Completed", color: "var(--success)" },
@@ -54,15 +53,15 @@ function AnalyticsPage() {
   const { data: overview } = useAnalyticsOverview();
   const { data: comparison } = useAlgorithmComparison();
 
-  const algoData = (comparison ?? []).map((row: Record<string, any>) => ({
+  const algoData = (comparison ?? []).map((row: Record<string, unknown>) => ({
     label: String(row["algorithm"] ?? "")
       .toLowerCase()
       .replace(/_/g, " ")
       .replace(/\b\w/g, (c) => c.toUpperCase()),
-    completion: Math.round(row["average_execution_time"] ?? 0),
-    cpu: Math.round(row["cpu_utilization"] ?? 0),
-    failure: Math.round((row["failure_rate"] ?? 0) * 10) / 10,
-    latency: Math.round(row["average_latency"] ?? 0),
+    completion: Math.round(Number(row["average_execution_time"] ?? 0)),
+    cpu: Math.round(Number(row["cpu_utilization"] ?? 0)),
+    failure: Math.round(Number(row["failure_rate"] ?? 0) * 10) / 10,
+    latency: Math.round(Number(row["average_latency"] ?? 0)),
   }));
 
   const chart = useMemo(
@@ -95,7 +94,13 @@ function AnalyticsPage() {
       />
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <MetricCard index={0} label="Throughput" value={`${formatNumber(summary.throughput)} /min`} icon={Zap} change={summary.trends.throughput} />
+        <MetricCard
+          index={0}
+          label="Throughput"
+          value={`${formatNumber(summary.throughput)} /min`}
+          icon={Zap}
+          change={summary.trends.throughput}
+        />
         <MetricCard
           index={1}
           label="Scheduling Latency"
@@ -121,13 +126,28 @@ function AnalyticsPage() {
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <ClayCard className="flex justify-center">
-          <CircularGauge value={Math.round(overview?.["success_rate"] ?? successRate)} label="Success" tone="success" caption="Completed vs failed" />
+          <CircularGauge
+            value={Math.round(overview?.["success_rate"] ?? successRate)}
+            label="Success"
+            tone="success"
+            caption="Completed vs failed"
+          />
         </ClayCard>
         <ClayCard className="flex justify-center">
-          <CircularGauge value={summary.cpuUtilization} label="CPU" tone={toneForValue(summary.cpuUtilization)} caption="Fleet average" />
+          <CircularGauge
+            value={summary.cpuUtilization}
+            label="CPU"
+            tone={toneForValue(summary.cpuUtilization)}
+            caption="Fleet average"
+          />
         </ClayCard>
         <ClayCard className="flex justify-center">
-          <CircularGauge value={summary.memoryUtilization} label="Memory" tone={toneForValue(summary.memoryUtilization)} caption="Fleet average" />
+          <CircularGauge
+            value={summary.memoryUtilization}
+            label="Memory"
+            tone={toneForValue(summary.memoryUtilization)}
+            caption="Fleet average"
+          />
         </ClayCard>
         <ClayCard className="flex justify-center">
           <CircularGauge
@@ -163,7 +183,10 @@ function AnalyticsPage() {
           />
         </ClayCard>
         <ClayCard>
-          <ClaySectionHeader title="Worker Workload Distribution" description="Active tasks per node" />
+          <ClaySectionHeader
+            title="Worker Workload Distribution"
+            description="Active tasks per node"
+          />
           <BarSeriesChart
             data={workload}
             series={[{ key: "tasks", label: "Active tasks", color: "var(--primary)" }]}

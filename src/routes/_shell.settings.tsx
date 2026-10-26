@@ -59,7 +59,11 @@ function SettingsPage() {
         actions={
           <Button
             className="clay-press rounded-full"
-            onClick={() => toast.success("Settings saved", { description: "Configuration applied to the control plane." })}
+            onClick={() =>
+              toast.success("Settings saved", {
+                description: "Configuration applied to the control plane.",
+              })
+            }
           >
             Save changes
           </Button>
@@ -68,7 +72,10 @@ function SettingsPage() {
 
       <div className="grid gap-4 lg:grid-cols-2">
         <ClayCard>
-          <ClaySectionHeader title="Backend Connection" description="Endpoints used once the FastAPI service is attached." />
+          <ClaySectionHeader
+            title="Backend Connection"
+            description="Endpoints used once the FastAPI service is attached."
+          />
           <div className="space-y-4">
             <Field id="api" label="REST base URL" value={apiUrl} onChange={setApiUrl} />
             <Field id="ws" label="WebSocket URL" value={wsUrl} onChange={setWsUrl} />
@@ -76,7 +83,10 @@ function SettingsPage() {
         </ClayCard>
 
         <ClayCard>
-          <ClaySectionHeader title="Scheduling Defaults" description="Applied to newly submitted tasks." />
+          <ClaySectionHeader
+            title="Scheduling Defaults"
+            description="Applied to newly submitted tasks."
+          />
           <div className="space-y-4">
             <div className="space-y-1.5">
               <Label htmlFor="algo">Default algorithm</Label>
@@ -95,13 +105,28 @@ function SettingsPage() {
                 </SelectContent>
               </Select>
             </div>
-            <Field id="retries" label="Max retries per task" value={retries} onChange={setRetries} type="number" />
-            <Field id="hb" label="Heartbeat interval (seconds)" value={heartbeat} onChange={setHeartbeat} type="number" />
+            <Field
+              id="retries"
+              label="Max retries per task"
+              value={retries}
+              onChange={setRetries}
+              type="number"
+            />
+            <Field
+              id="hb"
+              label="Heartbeat interval (seconds)"
+              value={heartbeat}
+              onChange={setHeartbeat}
+              type="number"
+            />
           </div>
         </ClayCard>
 
         <ClayCard>
-          <ClaySectionHeader title="Fault Tolerance" description="How the cluster reacts to node failures." />
+          <ClaySectionHeader
+            title="Fault Tolerance"
+            description="How the cluster reacts to node failures."
+          />
           <div className="space-y-3">
             <ToggleRow
               id="autorecover"
@@ -121,7 +146,10 @@ function SettingsPage() {
         </ClayCard>
 
         <ClayCard>
-          <ClaySectionHeader title="Appearance" description="Display preferences for this console." />
+          <ClaySectionHeader
+            title="Appearance"
+            description="Display preferences for this console."
+          />
           <ToggleRow
             id="compact"
             label="Compact tables"

@@ -2,7 +2,13 @@ import { AlertTriangle, Inbox, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export function LoadingState({ rows = 3, label = "Loading data" }: { rows?: number; label?: string }) {
+export function LoadingState({
+  rows = 3,
+  label = "Loading data",
+}: {
+  rows?: number;
+  label?: string;
+}) {
   return (
     <div className="clay space-y-3 p-6" role="status" aria-live="polite" aria-busy="true">
       <span className="sr-only">{label}</span>

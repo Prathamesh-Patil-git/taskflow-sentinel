@@ -75,7 +75,6 @@ function TasksPage() {
               value={formatNumber(count("pending"))}
               icon={Clock}
               tone="warning"
-
             />
             <MetricCard
               index={2}

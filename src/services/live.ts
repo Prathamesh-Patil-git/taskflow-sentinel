@@ -106,18 +106,22 @@ function spark(values: number[], length = 16) {
   return slice;
 }
 
-function buildSummaryFromApi(payload: Record<string, any>, series: SeriesPoint[]): DashboardSummary {
+function buildSummaryFromApi(
+  payload: Record<string, unknown>,
+  series: SeriesPoint[],
+): DashboardSummary {
+  const num = (k: string) => Number(payload[k] ?? 0);
   return {
-    totalTasks: payload["total_tasks"] ?? 0,
-    runningTasks: payload["running_tasks"] ?? 0,
-    completedTasks: payload["completed_tasks"] ?? 0,
-    failedTasks: payload["failed_tasks"] ?? 0,
-    activeWorkers: payload["active_workers"] ?? 0,
-    throughput: payload["throughput"] ?? 0,
-    cpuUtilization: Math.round(payload["cpu_utilization"] ?? 0),
-    memoryUtilization: Math.round(payload["memory_utilization"] ?? 0),
-    systemHealth: Math.round(payload["system_health"] ?? 0),
-    schedulerEfficiency: Math.round(payload["scheduler_efficiency"] ?? 0),
+    totalTasks: num("total_tasks"),
+    runningTasks: num("running_tasks"),
+    completedTasks: num("completed_tasks"),
+    failedTasks: num("failed_tasks"),
+    activeWorkers: num("active_workers"),
+    throughput: num("throughput"),
+    cpuUtilization: Math.round(num("cpu_utilization")),
+    memoryUtilization: Math.round(num("memory_utilization")),
+    systemHealth: Math.round(num("system_health")),
+    schedulerEfficiency: Math.round(num("scheduler_efficiency")),
     trends: {
       totalTasks: trend(series.map((p) => p.submitted)),
       runningTasks: trend(series.map((p) => p.running)),
@@ -131,7 +135,7 @@ function buildSummaryFromApi(payload: Record<string, any>, series: SeriesPoint[]
       runningTasks: spark(series.map((p) => p.running)),
       completedTasks: spark(series.map((p) => p.completed)),
       failedTasks: spark(series.map((p) => p.failed)),
-      activeWorkers: spark(series.map(() => payload["active_workers"] ?? 0)),
+      activeWorkers: spark(series.map(() => num("active_workers"))),
       throughput: spark(series.map((p) => p.throughput)),
     },
   };
@@ -147,15 +151,16 @@ export async function refresh(): Promise<void> {
       fetchLogs(),
     ]);
 
-    const series: SeriesPoint[] = (dashboard["series"] ?? []).map((p: any) => ({
-      t: p.t,
-      submitted: p.submitted ?? 0,
-      running: p.running ?? 0,
-      completed: p.completed ?? 0,
-      failed: p.failed ?? 0,
-      throughput: p.throughput ?? 0,
-      cpu: p.cpu ?? 0,
-      memory: p.memory ?? 0,
+    const rawSeries = (dashboard["series"] as Array<Record<string, unknown>> | undefined) ?? [];
+    const series: SeriesPoint[] = rawSeries.map((p) => ({
+      t: Number(p["t"] ?? 0),
+      submitted: Number(p["submitted"] ?? 0),
+      running: Number(p["running"] ?? 0),
+      completed: Number(p["completed"] ?? 0),
+      failed: Number(p["failed"] ?? 0),
+      throughput: Number(p["throughput"] ?? 0),
+      cpu: Number(p["cpu"] ?? 0),
+      memory: Number(p["memory"] ?? 0),
     }));
 
     const workers: Worker[] = (dashboard["workers"] ?? []).map(mapWorker);

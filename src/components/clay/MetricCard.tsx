@@ -35,7 +35,8 @@ export function MetricCard({
 }: Props) {
   const t = TONE[tone];
   const data = sparkline.map((v, i) => ({ i, v }));
-  const TrendIcon = change === undefined || change === 0 ? Minus : change > 0 ? TrendingUp : TrendingDown;
+  const TrendIcon =
+    change === undefined || change === 0 ? Minus : change > 0 ? TrendingUp : TrendingDown;
   const trendClass =
     change === undefined || change === 0
       ? "text-muted-foreground"
@@ -59,7 +60,13 @@ export function MetricCard({
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={data} margin={{ top: 2, bottom: 2, left: 0, right: 0 }}>
                 <defs>
-                  <linearGradient id={`spark-${label.replace(/\s/g, "")}`} x1="0" y1="0" x2="0" y2="1">
+                  <linearGradient
+                    id={`spark-${label.replace(/\s/g, "")}`}
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="1"
+                  >
                     <stop offset="0%" stopColor={t.stroke} stopOpacity={0.35} />
                     <stop offset="100%" stopColor={t.stroke} stopOpacity={0} />
                   </linearGradient>

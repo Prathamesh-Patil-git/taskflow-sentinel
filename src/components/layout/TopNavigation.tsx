@@ -30,7 +30,11 @@ export function TopNavigation() {
       : (NAV_ITEMS.find((i) => i.to === pathname)?.label ?? "TaskFlow");
 
   const healthTone =
-    summary.systemHealth >= 90 ? "text-success" : summary.systemHealth >= 70 ? "text-warning" : "text-destructive";
+    summary.systemHealth >= 90
+      ? "text-success"
+      : summary.systemHealth >= 70
+        ? "text-warning"
+        : "text-destructive";
 
   const submitSearch = (e: React.FormEvent) => {
     e.preventDefault();

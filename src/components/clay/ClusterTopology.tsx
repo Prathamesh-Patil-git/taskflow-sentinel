@@ -83,10 +83,7 @@ export function ClusterTopology({ workers }: { workers: Worker[] }) {
   return (
     <div className="flex flex-col items-center" ref={wrapperRef}>
       {/* Scheduler pill */}
-      <div
-        ref={schedulerRef}
-        className="clay-inset flex items-center gap-2 px-5 py-3"
-      >
+      <div ref={schedulerRef} className="clay-inset flex items-center gap-2 px-5 py-3">
         <Network className="h-4 w-4 text-primary" aria-hidden="true" />
         <span className="font-display text-sm font-semibold">Scheduler</span>
       </div>
@@ -110,12 +107,7 @@ export function ClusterTopology({ workers }: { workers: Worker[] }) {
                 : "var(--primary)";
           return (
             <g key={i}>
-              <path
-                d={path}
-                fill="none"
-                stroke="var(--border)"
-                strokeWidth={2}
-              />
+              <path d={path} fill="none" stroke="var(--border)" strokeWidth={2} />
               <motion.circle
                 r={3}
                 fill={dotColor}
@@ -144,32 +136,21 @@ export function ClusterTopology({ workers }: { workers: Worker[] }) {
         {nodes.map((w, i) => (
           <div
             key={w.id}
-            ref={(el) => { cardRefs.current[i] = el; }}
+            ref={(el) => {
+              cardRefs.current[i] = el;
+            }}
             className="clay p-3 text-center"
           >
-            <Server
-              className={cn("mx-auto h-4 w-4", STATUS_RING[w.status])}
-              aria-hidden="true"
-            />
-            <p className="mt-1.5 font-mono text-[11px] font-semibold">
-              {w.id}
-            </p>
+            <Server className={cn("mx-auto h-4 w-4", STATUS_RING[w.status])} aria-hidden="true" />
+            <p className="mt-1.5 font-mono text-[11px] font-semibold">{w.id}</p>
             <p className="mt-0.5 flex items-center justify-center gap-1 text-[11px] text-muted-foreground">
-              <span
-                className={cn(
-                  "h-1.5 w-1.5 rounded-full",
-                  STATUS_DOT[w.status],
-                )}
-              />
+              <span className={cn("h-1.5 w-1.5 rounded-full", STATUS_DOT[w.status])} />
               {w.status}
             </p>
-            <p className="mt-1 text-[11px] text-muted-foreground">
-              {w.activeTasks} tasks
-            </p>
+            <p className="mt-1 text-[11px] text-muted-foreground">{w.activeTasks} tasks</p>
           </div>
         ))}
       </div>
     </div>
   );
 }
-

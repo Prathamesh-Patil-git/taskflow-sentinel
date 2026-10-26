@@ -21,8 +21,7 @@ import type {
   WorkerStatus,
 } from "@/types";
 
-const BASE_URL =
-  (import.meta.env["VITE_API_URL"] as string | undefined) ?? "http://localhost:8000";
+const BASE_URL = (import.meta.env["VITE_API_URL"] as string | undefined) ?? "http://localhost:8000";
 
 export const http = axios.create({ baseURL: BASE_URL, timeout: 15_000 });
 
@@ -77,7 +76,97 @@ const ALGORITHM_FROM_API: Record<string, SchedulingAlgorithm> = {
 const ms = (value: string | null | undefined): number | null =>
   value ? new Date(value).getTime() : null;
 
-export function mapWorker(w: any): Worker {
+export interface ApiWorker {
+  worker_id: string;
+  hostname?: string;
+  status: string;
+  cpu_capacity?: number;
+  cpu_percent?: number;
+  memory_capacity?: number;
+  memory_percent?: number;
+  active_tasks?: number;
+  uptime_seconds?: number;
+  last_heartbeat?: string | null;
+  reliability_score?: number;
+  region?: string;
+}
+
+export interface ApiTaskEvent {
+  at: number;
+  level?: LogLevel;
+  message: string;
+}
+
+export interface ApiTask {
+  task_id: string;
+  name: string;
+  priority?: string;
+  status: string;
+  cpu_required?: number;
+  memory_required?: number;
+  assigned_worker_id?: string | null;
+  created_at?: string | null;
+  started_at?: string | null;
+  completed_at?: string | null;
+  failed_at?: string | null;
+  actual_duration?: number;
+  estimated_duration?: number;
+  retry_count?: number;
+  events?: ApiTaskEvent[];
+}
+
+export interface ApiScore {
+  worker_id: string;
+  score: number;
+}
+
+export interface ApiDecision {
+  task_id: string;
+  task_name: string;
+  cpu_required?: number;
+  memory_required?: number;
+  scores?: ApiScore[];
+  selected_worker_id?: string;
+  at?: string | number | null;
+}
+
+export interface ApiScheduler {
+  algorithm?: string;
+  queue_depth?: number;
+  scheduling_rate?: number;
+  average_latency?: number;
+  efficiency?: number;
+  decisions?: ApiDecision[];
+}
+
+export interface ApiFaultEvent {
+  at: number;
+  message: string;
+  tone: "info" | "warning" | "danger" | "success";
+}
+
+export interface ApiFault {
+  fault_id: string;
+  worker_id?: string;
+  fault_type: string;
+  severity: string;
+  detected_at?: string | null;
+  status: string;
+  affected_tasks?: number;
+  recovery_time?: number;
+  events?: ApiFaultEvent[];
+}
+
+export interface ApiLogEntry {
+  id: string;
+  timestamp: number;
+  level: LogLevel;
+  component: string;
+  worker_id?: string | null;
+  message: string;
+}
+
+export function mapWorker(w: ApiWorker): Worker {
   return {
     id: w.worker_id,
     name: w.hostname ?? w.worker_id,
@@ -94,7 +183,7 @@ export function mapWorker(w: any): Worker {
   };
 }
 
-export function mapTask(t: any): Task {
+export function mapTask(t: ApiTask): Task {
   const started = ms(t.started_at);
   const finished = ms(t.completed_at) ?? ms(t.failed_at);
   return {
@@ -110,7 +199,7 @@ export function mapTask(t: any): Task {
     completedAt: finished,
     duration: t.actual_duration ?? t.estimated_duration ?? 0,
     retryCount: t.retry_count ?? 0,
-    logs: (t.events ?? []).map((e: any) => ({
+    logs: (t.events ?? []).map((e: ApiTaskEvent) => ({
       at: e.at,
       level: e.level ?? "INFO",
       message: e.message,
@@ -118,26 +207,26 @@ export function mapTask(t: any): Task {
   };
 }
 
-export function mapScheduler(s: any): SchedulerState {
+export function mapScheduler(s: ApiScheduler): SchedulerState {
   return {
-    algorithm: ALGORITHM_FROM_API[s?.algorithm] ?? "resource-aware",
+    algorithm: ALGORITHM_FROM_API[s?.algorithm ?? ""] ?? "resource-aware",
     queueDepth: s?.queue_depth ?? 0,
     schedulingRate: s?.scheduling_rate ?? 0,
     averageLatency: s?.average_latency ?? 0,
     efficiency: Math.round(s?.efficiency ?? 0),
-    decisions: (s?.decisions ?? []).map((d: any) => ({
+    decisions: (s?.decisions ?? []).map((d: ApiDecision) => ({
       taskId: d.task_id,
       taskName: d.task_name,
       cpuRequired: d.cpu_required ?? 0,
       memoryRequired: d.memory_required ?? 0,
-      scores: (d.scores ?? []).map((x: any) => ({ workerId: x.worker_id, score: x.score })),
+      scores: (d.scores ?? []).map((x: ApiScore) => ({ workerId: x.worker_id, score: x.score })),
       selectedWorkerId: d.selected_worker_id ?? "",
-      at: ms(d.at) ?? Date.now(),
+      at: typeof d.at === "number" ? d.at : (ms(d.at) ?? Date.now()),
     })),
   };
 }
 
-export function mapFault(f: any): Fault {
+export function mapFault(f: ApiFault): Fault {
   return {
     id: f.fault_id,
     workerId: f.worker_id ?? "",
@@ -151,7 +240,7 @@ export function mapFault(f: any): Fault {
   };
 }
 
-export function mapLog(l: any): LogEntry {
+export function mapLog(l: ApiLogEntry): LogEntry {
   return {
     id: l.id,
     timestamp: l.timestamp,
@@ -163,23 +252,23 @@ export function mapLog(l: any): LogEntry {
 }
 
 // ── raw fetchers (used by the live store) ─────────────────────────────────
-export async function fetchDashboard(): Promise<Record<string, any>> {
+export async function fetchDashboard(): Promise<Record<string, unknown>> {
   return (await http.get("/api/dashboard")).data;
 }
 
-export async function fetchTasks(params?: Record<string, unknown>): Promise<any[]> {
+export async function fetchTasks(params?: Record<string, unknown>): Promise<ApiTask[]> {
   return (await http.get("/api/tasks", { params })).data;
 }
 
-export async function fetchScheduler(): Promise<any> {
+export async function fetchScheduler(): Promise<ApiScheduler> {
   return (await http.get("/api/scheduler")).data;
 }
 
-export async function fetchFaults(): Promise<any> {
+export async function fetchFaults(): Promise<{ faults: ApiFault[] }> {
   return (await http.get("/api/faults")).data;
 }
 
-export async function fetchLogs(params?: Record<string, unknown>): Promise<any[]> {
+export async function fetchLogs(params?: Record<string, unknown>): Promise<ApiLogEntry[]> {
   return (await http.get("/api/logs", { params })).data;
 }
 
@@ -259,11 +348,11 @@ export async function getAnalyticsOverview(): Promise<Record<string, number>> {
   return (await http.get("/api/analytics/overview")).data;
 }
 
-export async function getAlgorithmComparison(): Promise<Record<string, any>[]> {
+export async function getAlgorithmComparison(): Promise<Record<string, unknown>[]> {
   return (await http.get("/api/analytics/scheduling")).data;
 }
 
-export async function getResourceAnalytics(): Promise<Record<string, any>> {
+export async function getResourceAnalytics(): Promise<Record<string, unknown>> {
   return (await http.get("/api/analytics/resources")).data;
 }
 
