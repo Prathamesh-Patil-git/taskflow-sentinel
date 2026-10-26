@@ -1,0 +1,13 @@
+node_modules
+.output
+.vinxi
+dist
+dist-ssr
+.git
+.venv
+backend/.venv
+__pycache__
+*.pyc
+*.pyo
+.pytest_cache
+*.db
